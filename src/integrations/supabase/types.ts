@@ -1067,6 +1067,31 @@ export type Database = {
           xp: number
         }[]
       }
+      timer_action: {
+        Args: { _action: string; _id: string; _notes?: string }
+        Returns: {
+          active_seconds: number | null
+          attempt_id: string | null
+          created_at: string
+          ended_at: string | null
+          id: string
+          kind: string
+          module_id: string | null
+          notes: string | null
+          paused_at: string | null
+          paused_seconds: number
+          started_at: string
+          status: string
+          subject_id: string | null
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "timer_sessions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       app_role: "admin" | "user"
