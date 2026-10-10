@@ -1,4 +1,5 @@
 # SEEFAA roadmap
+- [ ] Polish existing saved question with a clear concept heading, highlighted prompt, structured data and explicit answer summaries; verify without editing saved data
 - [x] Structure all logged question displays with readable tables, answer choices and mobile-friendly spacing; verified existing saved question and retry selection on desktop/mobile without changing saved data
 - [x] Add uploaded 2025 cheat-sheet formulas by subject without changing personal formulas or 2027 curriculum
 - [x] Verify formula coverage, subject filtering and saving a reference formula to the notebook

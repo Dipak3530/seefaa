@@ -102,6 +102,10 @@ function MistakeDetail() {
         <span className="rounded-full bg-sun/30 px-2.5 py-1">Next review {fmtDate(m.next_review)}</span>
         {m.source === "ai" && <span className="rounded-full bg-primary/15 px-2.5 py-1">AI-generated question</span>}
       </div>
+      <header className="max-w-3xl border-l-4 border-primary pl-4 sm:pl-5">
+        <p className="mb-2 text-[11px] font-bold uppercase text-primary">Logged question · {fmtDate(m.created_at)}</p>
+        <h1 className="text-xl font-bold leading-snug sm:text-2xl">{m.concept || "Question review"}</h1>
+      </header>
       {recurring && (
         <div className="flex gap-2 rounded-xl border border-sun bg-sun/20 p-4 text-sm">
           <AlertTriangle className="h-5 w-5 shrink-0" />
@@ -134,14 +138,13 @@ function MistakeDetail() {
               </div>
             ) : (
               <>
-                <article className="rounded-lg border border-border bg-card p-4 sm:p-6">
-                  {m.concept && <p className="mb-4 text-xs font-bold uppercase text-primary">{m.concept}</p>}
+                <article className="question-reading rounded-lg border border-border bg-card p-4 sm:p-6">
                   <QuestionText text={m.question} />
                 </article>
                 {choices.length > 0 && <div className="mt-5 space-y-3"><p className="text-[11px] font-bold uppercase text-muted-foreground">Answer choices</p>{choices.map((c) => <AnswerChoice key={c.label} label={c.label} text={c.text} state={m.correct_verified && c.label === m.correct_answer ? "correct" : c.label === m.selected_answer ? "selected" : "default"} />)}</div>}
                 <div className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
-                  <div className="border-l-4 border-primary bg-accent/40 p-4"><p className="mb-1 text-xs font-semibold text-muted-foreground">Your answer</p><p className="break-words font-bold">{m.selected_answer ?? "Not recorded"}</p></div>
-                  <div className="border-l-4 border-info bg-info/5 p-4"><p className="mb-1 text-xs font-semibold text-muted-foreground">Recorded correct answer</p><p className="break-words font-bold">{m.correct_answer ?? "Not recorded"}</p>{m.correct_answer && <p className="mt-1 text-xs text-muted-foreground">{m.correct_verified ? "✓ Verified" : "Unverified"}</p>}</div>
+                  <div className="border-l-4 border-primary bg-accent/40 p-4"><p className="mb-2 text-xs font-semibold text-muted-foreground">Your answer</p><p className="break-words font-display text-lg font-bold">{m.selected_answer ?? "Not recorded"}</p>{choices.find((c) => c.label === m.selected_answer) && <p className="mt-2 text-sm leading-6">{choices.find((c) => c.label === m.selected_answer)?.text}</p>}</div>
+                  <div className="border-l-4 border-info bg-info/5 p-4"><p className="mb-2 text-xs font-semibold text-muted-foreground">Recorded correct answer</p><p className="break-words font-display text-lg font-bold">{m.correct_answer ?? "Not recorded"}</p>{choices.find((c) => c.label === m.correct_answer) && <p className="mt-2 text-sm leading-6">{choices.find((c) => c.label === m.correct_answer)?.text}</p>}{m.correct_answer && <p className="mt-2 text-xs font-semibold text-info">{m.correct_verified ? "✓ Verified" : "Unverified"}</p>}</div>
                 </div>
                 {m.notes && <div className="mt-5 border-t pt-4"><p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Your notes</p><QuestionText text={m.notes} /></div>}
               </>
