@@ -66,7 +66,7 @@ function MistakeDetail() {
     }
   }
   async function saveEdit() {
-    const patch: Record<string, unknown> = { ...form, updated_at: new Date().toISOString() };
+    const patch: Record<string, any> = { ...form, updated_at: new Date().toISOString() };
     if ("correct_answer" in form) patch.correct_verified = false;
     if ("module_id" in form && !form.module_id) patch.module_id = null;
     if ("los_id" in form && !form.los_id) patch.los_id = null;
