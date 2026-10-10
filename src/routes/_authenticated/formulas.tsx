@@ -15,9 +15,11 @@ import { useCurriculum } from "@/hooks/use-seefaa";
 import { explainFormula } from "@/lib/ai.functions";
 import { cn } from "@/lib/utils";
 import type { Tables } from "@/integrations/supabase/types";
+import { FormulaReference } from "@/components/seefaa/formula-reference";
+import type { ReferenceFormula } from "@/lib/formula-reference";
 
 export const Route = createFileRoute("/_authenticated/formulas")({
-  head: () => ({ meta: pageMeta("Formula Notebook — SEEFAA", "Your personal CFA formula and concept notebook.") }),
+  head: () => ({ meta: pageMeta("Formula Notebook — SEEFAA", "Subject-wise CFA formulas from the 2025 cheat sheet and your personal formula notebook.") }),
   component: Formulas,
 });
 
@@ -33,6 +35,7 @@ function Formulas() {
   const [q, setQ] = useState("");
   const [subject, setSubject] = useState("");
   const [favOnly, setFavOnly] = useState(false);
+  const [view, setView] = useState<"reference" | "personal">("reference");
   const [edit, setEdit] = useState<(typeof empty & { id?: string }) | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const { data, refetch } = useQuery({
@@ -52,11 +55,17 @@ function Formulas() {
   async function save() {
     if (!edit?.name || !edit.expression) return toast.error("Name and formula are required.");
     const { data: u } = await supabase.auth.getUser();
-    const row = { ...edit, user_id: u.user!.id, subject_id: edit.subject_id || null, module_id: edit.module_id || null, tags: edit.tags.split(",").map((t) => t.trim()).filter(Boolean) };
+    if (!u.user) return toast.error("Please sign in to save a formula.");
+    const row = { ...edit, user_id: u.user.id, subject_id: edit.subject_id || null, module_id: edit.module_id || null, tags: edit.tags.split(",").map((t) => t.trim()).filter(Boolean) };
     const { id, ...rest } = row;
     const { error } = id ? await supabase.from("formulas").update(rest).eq("id", id) : await supabase.from("formulas").insert(rest);
     if (error) return toast.error(error.message);
-    setEdit(null); refetch();
+    setEdit(null); setView("personal"); refetch();
+  }
+  function saveReference(formula: ReferenceFormula) {
+    const normalize = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
+    const subject = cur?.subjects.find((s) => normalize(s.name) === normalize(formula.subject));
+    setEdit({ ...empty, name: formula.name, expression: formula.expression, subject_id: subject?.id ?? "", tags: "cheat-sheet-2025", conditions: formula.note ?? "", explanation: `Source: CFI Education 2025 cheat sheet, page ${formula.page}.` });
   }
   async function patch(id: string, p: Partial<Tables<"formulas">>) { await supabase.from("formulas").update(p).eq("id", id); refetch(); }
   async function del(id: string) { if (!confirm("Delete this formula?")) return; await supabase.from("formulas").delete().eq("id", id); refetch(); }
@@ -70,12 +79,16 @@ function Formulas() {
   return (
     <div>
       <PageHeader title="Formula Notebook" subtitle="Write formulas in your own words. Search, tag and favourite the ones that matter." actions={<Button onClick={() => setEdit({ ...empty })}><Plus className="mr-2 h-4 w-4" />New formula</Button>} />
+      <div className="mb-5 flex flex-wrap gap-2" role="tablist" aria-label="Formula collection">
+        <Button role="tab" aria-selected={view === "reference"} variant={view === "reference" ? "default" : "outline"} onClick={() => setView("reference")}>Cheat sheet · 2025</Button>
+        <Button role="tab" aria-selected={view === "personal"} variant={view === "personal" ? "default" : "outline"} onClick={() => setView("personal")}>My formulas</Button>
+      </div>
       <div className="mb-4 flex flex-wrap gap-2">
         <div className="relative min-w-60 flex-1"><Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" /><Input className="bg-card pl-8" placeholder="Search name, formula or tag" value={q} onChange={(e) => setQ(e.target.value)} /></div>
-        <NativeSelect className="w-48" value={subject} onChange={(e) => setSubject(e.target.value)}><option value="">All subjects</option>{cur.subjects.map((s) => <option key={s.id} value={s.id}>{s.short_name}</option>)}</NativeSelect>
-        <Button variant={favOnly ? "default" : "outline"} onClick={() => setFavOnly(!favOnly)}><Star className="mr-1 h-4 w-4" />Favourites</Button>
+        <NativeSelect aria-label="Filter formulas by subject" className="w-48" value={subject} onChange={(e) => setSubject(e.target.value)}><option value="">All subjects</option>{cur.subjects.map((s) => <option key={s.id} value={s.id}>{s.short_name}</option>)}</NativeSelect>
+        {view === "personal" && <Button variant={favOnly ? "default" : "outline"} onClick={() => setFavOnly(!favOnly)}><Star className="mr-1 h-4 w-4" />Favourites</Button>}
       </div>
-      {!list.length ? <Empty icon={<Sigma className="h-8 w-8" />} title="No formulas yet" body="Add the formulas you keep forgetting — they'll be here for quick recall." /> : (
+      {view === "reference" ? <FormulaReference subjectName={cur.subject(subject)?.name ?? ""} search={q} onSave={saveReference} /> : !list.length ? <Empty icon={<Sigma className="h-8 w-8" />} title="No formulas yet" body="Add the formulas you keep forgetting — they'll be here for quick recall." /> : (
         <div className="grid gap-4 md:grid-cols-2">
           {list.map((f) => {
             const ex = data?.ex.find((e) => e.formula_id === f.id);
