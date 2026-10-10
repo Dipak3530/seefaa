@@ -1,4 +1,5 @@
 # SEEFAA roadmap
+- [ ] Resolve stale optimized React module identity crash and verify signed-in pages
 - [x] Editorial redesign: global cream/coral design system and landing page
 - [x] Editorial redesign: horizontal navigation, dashboard, all study screens
 - [x] Editorial redesign: verify signed-in navigation, editable forms, sign-out and timer pause/resume persistence
