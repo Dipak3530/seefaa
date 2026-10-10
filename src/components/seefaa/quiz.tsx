@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import type { Tables } from "@/integrations/supabase/types";
 import { useInvalidate } from "@/hooks/use-seefaa";
 import { cn } from "@/lib/utils";
+import { AnswerChoice, QuestionText } from "@/components/seefaa/question";
 
 type M = Tables<"mistakes">;
 const norm = (s?: string | null) => (s ?? "").trim().toUpperCase().replace(/[^A-Z0-9.]/g, "");
@@ -33,7 +34,8 @@ export function QuizRunner({ items, onDone }: { items: M[]; onDone: () => void }
 
   async function record(correct: boolean) {
     const { data: u } = await supabase.auth.getUser();
-    await supabase.from("mistake_attempts").insert({ user_id: u.user!.id, mistake_id: m.id, answer: answer || null, is_correct: correct });
+    if (!u.user) return;
+    await supabase.from("mistake_attempts").insert({ user_id: u.user.id, mistake_id: m.id, answer: answer || null, is_correct: correct });
     setScore((s) => ({ right: s.right + (correct ? 1 : 0), total: s.total + 1 }));
     inv("mistakes", "xp", "revision", "dashboard");
     setI(i + 1);
@@ -42,18 +44,13 @@ export function QuizRunner({ items, onDone }: { items: M[]; onDone: () => void }
   }
 
   return (
-    <div className="card-soft p-6">
-      <p className="text-xs text-muted-foreground">Question {i + 1} of {items.length}</p>
-      <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{m.question}</p>
+    <div className="card-soft p-4 sm:p-6">
+      <p className="mb-5 border-b pb-3 text-xs font-bold uppercase text-primary">Question {i + 1} of {items.length}</p>
+      <QuestionText text={m.question} />
       {choices.length ? (
         <div className="mt-4 space-y-2">
           {choices.map((c) => (
-            <Button variant="outline" key={c.label} disabled={revealed} onClick={() => setAnswer(c.label)}
-              className={cn("h-auto w-full justify-start gap-3 whitespace-normal rounded-lg p-3 text-left text-sm",
-                answer === c.label && "border-primary bg-accent",
-                revealed && known && norm(c.label) === norm(m.correct_answer) && "border-success bg-success/15")}>
-              <b>{c.label}.</b> {c.text}
-            </Button>
+            <AnswerChoice key={c.label} label={c.label} text={c.text} disabled={revealed} onSelect={() => setAnswer(c.label)} state={revealed && known && norm(c.label) === norm(m.correct_answer) ? "correct" : revealed && known && answer === c.label && !isRight ? "incorrect" : answer === c.label ? "selected" : "default"} />
           ))}
         </div>
       ) : (
