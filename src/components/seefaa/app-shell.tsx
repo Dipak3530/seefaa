@@ -28,7 +28,7 @@ const PRIMARY_NAV = [NAV[0], NAV[2], NAV[1], NAV[4], NAV[6], NAV[9]];
 const SECONDARY_NAV = [NAV[3], NAV[5], NAV[7], NAV[8], NAV[10]];
 
 export function Logo() {
-  return <Link to="/" aria-label="SEEFAA home" className="flex shrink-0 items-center gap-2.5"><span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground"><BookOpen className="h-5 w-5" strokeWidth={2.5} /></span><span className="font-display text-2xl font-extrabold text-foreground">SEEFAA<span className="text-primary">.</span></span></Link>;
+  return <Link to="/" aria-label="SEEFAA home" className="flex shrink-0 items-center gap-2"><span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border-2 border-foreground bg-primary text-primary-foreground sm:h-9 sm:w-9"><BookOpen className="h-5 w-5" strokeWidth={2.5} /></span><span className="font-display text-xl font-extrabold text-foreground sm:text-2xl">SEEFAA<span className="text-primary">.</span></span></Link>;
 }
 
 function NavList({ onNavigate }: { onNavigate?: () => void }) {

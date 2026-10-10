@@ -12,6 +12,7 @@
 ## Architecture rules
 - Keep Vite's `optimizeDeps.ignoreOutdatedRequests` false so dependency updates cannot serve React under stale and current URLs with separate hook dispatchers.
 - Shared visual tokens live in `src/styles.css`, reusable learning surfaces in `bits.tsx`, and authenticated navigation in `app-shell.tsx`; redesigns change presentation without replacing data hooks or database workflows.
+- Tactile button treatments live in the shared Button variants and semantic CSS tokens, so all actions inherit consistent outline, texture and press states without altering their workflows.
 - Content routes use the browser-safe `pageMeta` helper for consistent page-specific social metadata without importing server modules.
 - XP is awarded only by database triggers into `xp_ledger` with a unique `source_key`; clients cannot insert XP (prevents duplicate/forged awards).
 - Timer pause/resume/finish goes through the `timer_action` SQL function so durations use server timestamps; one open timer per user enforced by a partial unique index.

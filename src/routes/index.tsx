@@ -66,7 +66,7 @@ function Landing() {
         <Link to="/plan" className="px-3 py-4 text-sm font-semibold hover:text-primary">Study Planner</Link>
         <Link to="/mistakes" className="px-3 py-4 text-sm font-semibold hover:text-primary">Mistake Bank</Link>
       </nav>
-      <div className="flex shrink-0 gap-2"><Button asChild variant="ghost"><Link to="/auth">Sign in</Link></Button><Button asChild className="h-10"><Link to="/auth" search={{ mode: "signup" }}>Get started <ArrowRight /></Link></Button></div>
+      <div className="flex shrink-0 gap-2"><Button asChild variant="ghost" className="px-2 sm:px-4"><Link to="/auth">Sign in</Link></Button><Button asChild className="h-10 px-3 sm:px-4"><Link to="/auth" search={{ mode: "signup" }}>Get started <ArrowRight className="hidden sm:block" /></Link></Button></div>
     </header>
     <div className="relative">
       <img src={doodles} width={1536} height={1024} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-35" />
