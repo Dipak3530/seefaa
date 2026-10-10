@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,11 +61,21 @@ function AuthPage() {
     }
   }
 
+  // Returning from Google (or already signed in): forward once the session is present.
+  useEffect(() => {
+    let done = false;
+    const go = () => { if (!done) { done = true; navigate({ to: "/dashboard", replace: true }); } };
+    supabase.auth.getSession().then(({ data }) => { if (data.session) go(); });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => { if (session) go(); });
+    return () => sub.subscription.unsubscribe();
+  }, [navigate]);
+
   async function google() {
-    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/auth` });
     if (r.error) return toast.error(r.error.message ?? "Google sign-in failed");
     if (r.redirected) return;
-    navigate({ to: "/dashboard" });
+    const { data } = await supabase.auth.getSession();
+    if (data.session) navigate({ to: "/dashboard" });
   }
 
   return (
