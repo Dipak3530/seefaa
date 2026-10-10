@@ -9,6 +9,8 @@ import { useAttempt, useCurriculum, useInvalidate, useProfile, useProgress } fro
 import { fmtDate } from "@/lib/cfa";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/curriculum/$subjectId")({
   head: () => ({ meta: pageMeta("Subject progress — SEEFAA", "Modules, LOS, confidence and revision checkpoints for this subject.") }),
@@ -22,6 +24,8 @@ function SubjectPage() {
   const { data: attempt } = useAttempt();
   const { data: profile } = useProfile();
   const inv = useInvalidate();
+  const [query, setQuery] = useState("");
+  const [status, setStatus] = useState("all");
   const { data: extra } = useQuery({
     queryKey: ["subject-extra", attempt?.id, subjectId],
     enabled: !!attempt,
@@ -62,9 +66,14 @@ function SubjectPage() {
       <Link to="/curriculum" className="mb-3 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"><ChevronLeft className="h-4 w-4" /> All subjects</Link>
       <PageHeader title={subject.name} subtitle={`${d} of ${mods.length} modules complete`} actions={<><Button asChild variant="outline"><Link to="/formulas">Formula notebook</Link></Button><Button asChild><Link to="/mistakes">Review mistakes</Link></Button></>} />
       <Bar value={(d / Math.max(1, mods.length)) * 100} className="mb-6 h-3" />
+      <div className="mb-5 grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px]">
+        <Input value={query} onChange={e => setQuery(e.target.value)} aria-label="Search subject modules" placeholder="Search this subject…" className="bg-card" />
+        <NativeSelect value={status} onChange={e => setStatus(e.target.value)} aria-label="Filter module status"><option value="all">All statuses</option><option value="not_started">Not started</option><option value="in_progress">In progress</option><option value="completed">Completed</option></NativeSelect>
+      </div>
       <div className="space-y-3">
         {mods.map((m, i) => {
           const p = pm(m.id);
+          if (!m.title.toLowerCase().includes(query.trim().toLowerCase()) || (status !== "all" && (p?.status ?? "not_started") !== status)) return null;
           const cps = (extra?.cps ?? []).filter((c) => c.module_id === m.id).sort((a, b) => a.stage - b.stage);
           const mistakes = (extra?.mistakes ?? []).filter((x) => x.module_id === m.id).length;
           const pr = (extra?.practice ?? []).filter((x) => x.module_id === m.id);
@@ -100,9 +109,9 @@ function SubjectPage() {
                   {los.map((l) => {
                     const lp = prog.los.find((x) => x.los_id === l.id);
                     return (
-                      <li key={l.id} className="flex items-center gap-2 text-sm">
+                       <li key={l.id} className="grid grid-cols-[auto_auto_minmax(0,1fr)] items-start gap-2 text-sm">
                         <input type="checkbox" checked={lp?.status === "completed"} onChange={(e) => setLos(l.id, e.target.checked ? "completed" : "in_progress")} />
-                        <span className="text-xs text-muted-foreground">{l.code}</span> {l.statement}
+                         <span className="text-xs text-muted-foreground">{l.code}</span><span>{l.statement}</span>
                       </li>
                     );
                   })}
