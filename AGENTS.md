@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
+- Keep source-attributed cheat-sheet equations in a browser-safe reference catalog separate from user-owned formulas; saving a reference uses the existing notebook form and never seeds user data on page load.
 - Keep Vite's `optimizeDeps.ignoreOutdatedRequests` false so dependency updates cannot serve React under stale and current URLs with separate hook dispatchers.
 - Shared visual tokens live in `src/styles.css`, reusable learning surfaces in `bits.tsx`, and authenticated navigation in `app-shell.tsx`; redesigns change presentation without replacing data hooks or database workflows.
 - Tactile button treatments and loading states live in shared Button variants and semantic CSS tokens; supporting action colors remain tokenized so all actions inherit consistent outline, texture and press states without altering workflows.
