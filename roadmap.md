@@ -1,4 +1,6 @@
 # SEEFAA roadmap
+- [ ] Add uploaded 2025 cheat-sheet formulas by subject without changing personal formulas or 2027 curriculum
+- [ ] Verify formula coverage, subject filtering and saving a reference formula to the notebook
 - [x] Polish shared comic button variants and interaction states without replacing existing workflows
 - [x] Prioritise daily study actions, saved preparation progress, and next tasks on dashboard
 - [x] Improve curriculum search, status visibility, and long-title readability
