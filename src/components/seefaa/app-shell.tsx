@@ -28,7 +28,7 @@ const PRIMARY_NAV = [NAV[0], NAV[2], NAV[1], NAV[4], NAV[6], NAV[9]];
 const SECONDARY_NAV = [NAV[3], NAV[5], NAV[7], NAV[8], NAV[10]];
 
 export function Logo() {
-  return <Link to="/" aria-label="SEEFAA home" className="flex shrink-0 items-center gap-2.5"><span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground"><BookOpen className="h-5 w-5" strokeWidth={2.5} /></span><span className="font-display text-2xl font-extrabold text-foreground">SEEFAA<span className="text-primary">.</span></span></Link>;
+  return <Link to="/" aria-label="SEEFAA home" className="flex shrink-0 items-center gap-2"><span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border-2 border-foreground bg-primary text-primary-foreground sm:h-9 sm:w-9"><BookOpen className="h-5 w-5" strokeWidth={2.5} /></span><span className="font-display text-xl font-extrabold text-foreground sm:text-2xl">SEEFAA<span className="text-primary">.</span></span></Link>;
 }
 
 function NavList({ onNavigate }: { onNavigate?: () => void }) {
@@ -45,9 +45,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     await qc.cancelQueries(); qc.clear(); await supabase.auth.signOut(); navigate({ to: "/auth", replace: true });
   }
   const side = <div className="flex h-full flex-col gap-6 overflow-y-auto p-5"><Logo /><NavList onNavigate={() => setOpen(false)} /><div className="mt-auto space-y-2 border-t pt-4"><div className="flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-sm"><Trophy className="h-4 w-4 text-primary" /><span className="font-bold">{xp?.total ?? 0} XP</span> earned</div><Button variant="ghost" className="w-full justify-start" onClick={signOut}><LogOut /> Sign out</Button></div></div>;
-  return <div className="min-h-screen bg-background">
+  return <div className="comic-canvas min-h-screen bg-background">
     <header className="sticky top-0 z-30 border-b bg-background px-4 pt-3 sm:px-6 lg:px-8">
-      <div className="mx-auto grid max-w-[1440px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-lg border bg-card px-4 lg:flex lg:justify-between">
+      <div className="comic-nav mx-auto grid max-w-[1440px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-lg bg-card px-4 lg:flex lg:justify-between">
         <div className="min-w-0 py-3"><Logo /></div>
         <nav aria-label="Primary navigation" className="app-navigation hidden min-w-0 items-center xl:flex">{PRIMARY_NAV.map(n => <Link key={n.to} to={n.to} className="relative whitespace-nowrap px-3 py-6 text-xs font-semibold text-muted-foreground hover:text-primary">{n.label}</Link>)}</nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
