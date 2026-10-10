@@ -1,4 +1,7 @@
 # SEEFAA roadmap
+- [ ] Editorial redesign: global cream/coral design system and landing page
+- [ ] Editorial redesign: horizontal navigation, dashboard, all study screens
+- [ ] Editorial redesign: verify navigation, forms, authentication and timer persistence
 - [x] Database, security, XP ledger, timer, storage
 - [x] Curriculum replaced with user-supplied 2027 module list (Quant "Appendices A–E" flagged supplementary)
 - [x] App shell, auth, onboarding, dashboard + timers
