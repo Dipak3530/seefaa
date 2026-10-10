@@ -90,7 +90,7 @@ export function TimerPanel() {
   const secs = activeSeconds(s, now);
 
   async function act(action: "pause" | "resume" | "finish") {
-    const { error } = await supabase.rpc("timer_action", { _id: s!.id, _action: action, _notes: action === "finish" ? notes || undefined : undefined });
+    const { error } = await supabase.rpc("timer_action", { _id: s!.id, _action: action, ...(action === "finish" && notes ? { _notes: notes } : {}) });
     if (error) return toast.error(error.message);
     if (action === "finish") {
       toast.success(`Saved ${fmtHMS(secs)} of ${s!.kind === "study" ? "study" : "revision"} time`);
