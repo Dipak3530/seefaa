@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { ArrowUpRight, BookOpen, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { PageHeader, Bar } from "@/components/seefaa/bits";
 import { useCurriculum, useProgress } from "@/hooks/use-seefaa";
@@ -36,19 +36,20 @@ function CurriculumPage() {
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {cur.subjects.map((s) => {
+          {cur.subjects.map((s, i) => {
             const mods = cur.modulesOf(s.id);
             const d = mods.filter((m) => done.has(m.id)).length;
             const plan = prog.plans.find((p) => p.subject_id === s.id);
             return (
-              <Link key={s.id} to="/curriculum/$subjectId" params={{ subjectId: s.id }} className="card-soft p-5 transition hover:-translate-y-0.5">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold">{s.name}</h3>
-                  {plan?.status === "active" && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-medium text-deep">Studying</span>}
+              <Link key={s.id} to="/curriculum/$subjectId" params={{ subjectId: s.id }} className={`card-soft flex min-w-0 flex-col p-5 transition hover:-translate-y-0.5 hover:border-primary ${plan?.status === "active" ? "border-primary" : ""}`}>
+                <div className="mb-5 flex items-center justify-between"><span className="grid h-10 w-10 place-items-center rounded-md bg-accent text-primary"><BookOpen className="h-5 w-5" /></span><span className="font-display text-sm font-bold text-muted-foreground">{String(i + 1).padStart(2, "0")}</span></div>
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+                  <h3 className="min-w-0 text-base font-bold">{s.name}</h3>
+                  <ArrowUpRight className="h-4 w-4 text-primary" />
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">{mods.length} modules · ~{s.est_hours}h</p>
-                <Bar value={(d / Math.max(1, mods.length)) * 100} className="mt-4" />
-                <p className="mt-1 text-xs text-muted-foreground">{d}/{mods.length} complete</p>
+                <p className="mb-5 mt-2 text-xs text-muted-foreground">{mods.length} modules · ~{s.est_hours}h {plan?.status === "active" && <span className="ml-1 font-bold text-primary">· Studying</span>}</p>
+                <Bar value={(d / Math.max(1, mods.length)) * 100} className="mt-auto" />
+                <div className="mt-2 flex justify-between text-xs"><span className="text-muted-foreground">{d}/{mods.length} complete</span><span className="font-bold text-primary">{Math.round(d / Math.max(1, mods.length) * 100)}%</span></div>
               </Link>
             );
           })}

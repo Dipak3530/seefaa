@@ -5,10 +5,11 @@ import { cn } from "@/lib/utils";
 
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground md:text-3xl">{title}</h1>
-        {subtitle && <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{subtitle}</p>}
+    <div className="mb-7 grid grid-cols-1 items-end gap-4 sm:grid-cols-[minmax(0,1fr)_auto]">
+      <div className="min-w-0">
+        <p className="mb-2 text-[10px] font-bold uppercase text-primary">SEEFAA / YOUR STUDY SPACE</p>
+        <h1 className="text-2xl font-bold leading-tight text-foreground md:text-3xl">{title}</h1>
+        {subtitle && <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
@@ -17,10 +18,10 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
 
 export function Panel({ title, children, className, action }: { title?: string; children: ReactNode; className?: string; action?: ReactNode }) {
   return (
-    <section className={cn("card-soft p-5", className)}>
+    <section className={cn("min-w-0 border-t border-border py-5", className)}>
       {(title || action) && (
-        <div className="mb-4 flex items-center justify-between gap-2">
-          {title && <h2 className="text-base font-semibold">{title}</h2>}
+        <div className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+          {title && <h2 className="min-w-0 text-base font-bold">{title}</h2>}
           {action}
         </div>
       )}
@@ -31,7 +32,7 @@ export function Panel({ title, children, className, action }: { title?: string; 
 
 export function Empty({ icon, title, body, action }: { icon?: ReactNode; title: string; body?: string; action?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center rounded-xl border border-dashed bg-muted/40 px-6 py-10 text-center">
+    <div className="flex flex-col items-center rounded-lg border border-dashed bg-card/50 px-6 py-10 text-center">
       {icon && <div className="mb-3 text-primary">{icon}</div>}
       <p className="font-medium">{title}</p>
       {body && <p className="mt-1 max-w-sm text-sm text-muted-foreground">{body}</p>}
@@ -42,10 +43,10 @@ export function Empty({ icon, title, body, action }: { icon?: ReactNode; title: 
 
 export function Stat({ label, value, hint, tone = "default" }: { label: string; value: ReactNode; hint?: string; tone?: "default" | "sun" | "deep" }) {
   return (
-    <div className={cn("rounded-xl border p-4", tone === "sun" && "bg-sun/25 border-sun/50", tone === "deep" && "bg-deep text-deep-foreground border-deep", tone === "default" && "bg-card")}>
-      <p className={cn("text-xs font-medium uppercase tracking-wide", tone === "deep" ? "opacity-80" : "text-muted-foreground")}>{label}</p>
-      <p className="mt-1 font-display text-2xl font-semibold">{value}</p>
-      {hint && <p className={cn("mt-0.5 text-xs", tone === "deep" ? "opacity-80" : "text-muted-foreground")}>{hint}</p>}
+    <div className={cn("card-soft min-w-0 border-t-2 p-5", tone === "sun" && "border-t-primary bg-accent/45", tone === "deep" && "border-t-primary", tone === "default" && "border-t-foreground")}>
+      <p className="text-[10px] font-bold uppercase text-muted-foreground">{label}</p>
+      <div className={cn("mt-3 break-words font-display text-2xl font-bold", tone !== "default" && "text-primary")}>{value}</div>
+      {hint && <p className="mt-2 text-xs leading-5 text-muted-foreground">{hint}</p>}
     </div>
   );
 }

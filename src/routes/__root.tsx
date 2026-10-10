@@ -20,7 +20,7 @@ function NotFoundComponent() {
     <div className="sky-bg flex min-h-screen items-center justify-center px-4">
       <div className="card-soft max-w-md p-10 text-center">
         <h1 className="text-6xl font-bold text-deep">404</h1>
-        <h2 className="mt-4 text-xl font-semibold">This patch of sky is empty</h2>
+        <h2 className="mt-4 text-xl font-semibold">A page still to be written</h2>
         <p className="mt-2 text-sm text-muted-foreground">The page you're looking for doesn't exist.</p>
         <Link to="/" className="mt-6 inline-flex rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
           Go home

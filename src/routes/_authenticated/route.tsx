@@ -22,7 +22,7 @@ function Layout() {
   useEffect(() => {
     if (profile && !profile.onboarded && !onOnboarding) navigate({ to: "/onboarding" });
   }, [profile, onOnboarding, navigate]);
-  if (isLoading) return <div className="sky-bg grid min-h-screen place-items-center text-muted-foreground">Loading your sky…</div>;
+  if (isLoading) return <div className="sky-bg grid min-h-screen place-items-center text-muted-foreground">Loading your study space…</div>;
   if (onOnboarding) return <Outlet />;
   return (
     <AppShell>

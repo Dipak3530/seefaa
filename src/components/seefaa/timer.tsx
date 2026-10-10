@@ -68,11 +68,11 @@ export function TimerStartButtons() {
         </NativeSelect>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <Button size="lg" className="h-14 text-base" onClick={() => start("study")} disabled={!!open}>
-          <BookOpen className="mr-2 h-5 w-5" /> Start Studying
+        <Button size="lg" className="h-12 min-w-0 px-2 text-xs sm:text-sm" onClick={() => start("study")} disabled={!!open}>
+          <BookOpen className="h-4 w-4" /> Start Studying
         </Button>
-        <Button size="lg" className="h-14 bg-sun text-sun-foreground text-base hover:bg-sun/85" onClick={() => start("revision")} disabled={!!open}>
-          <RotateCcw className="mr-2 h-5 w-5" /> Start Revision
+        <Button size="lg" variant="outline" className="h-12 min-w-0 border-primary px-2 text-xs text-primary sm:text-sm" onClick={() => start("revision")} disabled={!!open}>
+          <RotateCcw className="h-4 w-4" /> Start Revision
         </Button>
       </div>
     </div>
@@ -107,7 +107,7 @@ export function TimerPanel() {
 
   return (
     <>
-      <div className="fixed bottom-20 right-4 z-40 flex items-center gap-3 rounded-2xl border bg-card px-4 py-3 shadow-lg md:bottom-6">
+      <div className="editorial-shadow fixed bottom-20 right-4 z-40 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-lg border border-foreground bg-card px-4 py-3 xl:bottom-6">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
             {s.kind === "study" ? "Studying" : "Revision"} {s.status === "paused" && "· paused"}
