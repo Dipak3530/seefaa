@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 import appCss from "../styles.css?url";
@@ -22,9 +23,9 @@ function NotFoundComponent() {
         <h1 className="text-6xl font-bold text-deep">404</h1>
         <h2 className="mt-4 text-xl font-semibold">A page still to be written</h2>
         <p className="mt-2 text-sm text-muted-foreground">The page you're looking for doesn't exist.</p>
-        <Link to="/" className="mt-6 inline-flex rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+        <Button asChild className="mt-6"><Link to="/">
           Go home
-        </Link>
+        </Link></Button>
       </div>
     </div>
   );
@@ -42,16 +43,15 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
         <h1 className="text-xl font-semibold">This page didn't load</h1>
         <p className="mt-2 text-sm text-muted-foreground">Something went wrong. Your saved data is safe.</p>
         <div className="mt-6 flex justify-center gap-2">
-          <button
+          <Button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
           >
             Try again
-          </button>
-          <a href="/" className="rounded-md border px-4 py-2 text-sm font-medium">Go home</a>
+          </Button>
+          <Button asChild variant="outline"><a href="/">Go home</a></Button>
         </div>
       </div>
     </div>

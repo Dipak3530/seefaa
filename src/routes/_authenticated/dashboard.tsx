@@ -81,11 +81,28 @@ function Dashboard() {
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+      <div className="grid gap-6 border-b pb-6 lg:grid-cols-5">
+        <section className="min-w-0 lg:col-span-3">
+          <p className="mb-2 text-xs font-bold uppercase text-primary">Next up</p>
+          <h2 className="mb-4 font-display text-xl font-bold leading-relaxed">{data?.tasks.find(t => !t.done)?.title || (data?.revs ? "Your due revisions are ready." : "Make room for your next concept.")}</h2>
+          <TimerStartButtons />
+          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+            <span>Study <b>{fmtHours(studySecs)}</b></span><span>Revision <b>{fmtHours(revSecs)}</b></span><span className="font-bold text-primary">{fmtHours(studySecs + revSecs)} total today</span>
+          </div>
+        </section>
+        <section className="min-w-0 border-t pt-5 lg:col-span-2 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+          <p className="mb-3 text-xs font-bold uppercase text-muted-foreground">Overall preparation</p>
+          <div className="mb-3 flex items-end justify-between gap-3"><span className="font-display text-4xl font-bold">{pct}%</span><span className="text-sm text-muted-foreground">{doneModules}/{totalModules} modules</span></div>
+          <Bar value={pct} />
+          <p className="mt-3 text-xs text-muted-foreground">{prog.modules.filter(m => m.status === "in_progress").length} in progress · {totalModules - prog.modules.filter(m => m.status === "completed" || m.status === "in_progress").length} not started</p>
+          <p className="mt-3 text-xs text-muted-foreground">{cur.los.length ? `${prog.los.filter(l => l.status === "completed").length}/${cur.los.length} learning outcomes completed · ${prog.los.filter(l => l.status === "in_progress").length} in progress` : "Verified learning outcomes not yet available"}</p>
+          <div className="mt-5 flex flex-wrap gap-3"><Button asChild size="sm" variant="outline"><Link to="/curriculum">View curriculum <ArrowUpRight /></Link></Button><Button asChild size="sm" variant="secondary"><Link to="/revision">{(data?.revs ?? 0) + (data?.mistakesDue ?? 0)} reviews due <RefreshCw /></Link></Button></div>
+        </section>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Stat tone="deep" label="Exam countdown" value={daysToExam == null ? "No date" : daysToExam >= 0 ? `${daysToExam} days` : "Passed"} hint={attempt.exam_date ? fmtDate(attempt.exam_date) : "Add it in Settings"} />
-        <Stat label="Syllabus complete" value={`${pct}%`} hint={`${doneModules}/${totalModules} modules · ${studyPhase(daysToExam, pct)}`} />
-        <Stat label="Study time today" value={fmtHours(studySecs)} hint="Time invested in understanding" />
-        <Stat label="Revision time today" value={fmtHours(revSecs)} hint="Make what you've learned stick" />
+        <Stat label="Preparation phase" value={studyPhase(daysToExam, pct)} hint={`${doneModules} modules completed`} />
         <Stat label="Target completion" value={daysToTarget == null ? "—" : `${daysToTarget} days`} hint={eta ? `At your pace: ${fmtDate(eta)}` : "Not enough data for an estimate"} />
         <Stat tone="sun" label="XP · streak" value={<span className="flex items-center gap-2">{xp?.total ?? 0}<Flame className="h-5 w-5" />{streak}</span>} hint="Days in a row with learning activity" />
       </div>
@@ -94,7 +111,7 @@ function Dashboard() {
         <Panel title="Today's plan" className="lg:col-span-3" action={<Button asChild size="sm" variant="ghost"><Link to="/plan">Full plan</Link></Button>}>
           {data?.overdue ? <p className="mb-3 rounded-md bg-sun/25 px-3 py-2 text-xs"><CalendarClock className="mr-1 inline h-3.5 w-3.5" />{data.overdue} earlier task(s) still open — they're kept on your plan as catch-up.</p> : null}
           {!data?.tasks.length ? (
-            <Empty title="Nothing planned today" body="Enjoy the break, or regenerate your plan to include today." />
+            <Empty title="Nothing planned today" action={<Button asChild variant="secondary"><Link to="/plan">Create or adjust your plan <ArrowUpRight /></Link></Button>} />
           ) : (
             <ul className="space-y-2">
               {data.tasks.map((t) => (
@@ -109,14 +126,10 @@ function Dashboard() {
             </ul>
           )}
         </Panel>
-        <Panel title="Study timer" className="lg:col-span-2">
-          <p className="mb-4 text-sm font-semibold">{data?.tasks.find(t => !t.done)?.title || "Your next concept starts here."}</p>
-          <TimerStartButtons />
-          <div className="mt-4 grid grid-cols-3 gap-2 text-center text-sm">
-            <div className="rounded-lg bg-muted p-2"><p className="text-xs text-muted-foreground">Study</p><p className="font-semibold">{fmtHours(studySecs)}</p></div>
-            <div className="rounded-lg bg-muted p-2"><p className="text-xs text-muted-foreground">Revision</p><p className="font-semibold">{fmtHours(revSecs)}</p></div>
-            <div className="rounded-lg bg-muted p-2"><p className="text-xs text-muted-foreground">Total today</p><p className="font-semibold">{fmtHours(studySecs + revSecs)}</p></div>
-          </div>
+        <Panel title="Your next milestone" className="lg:col-span-2">
+          <p className="text-sm leading-6">{attempt.exam_date ? `CFA exam · ${fmtDate(attempt.exam_date)}` : "Choose your CFA exam date."}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{attempt.target_completion_date ? `Curriculum target · ${fmtDate(attempt.target_completion_date)}` : "Set a curriculum completion target."}</p>
+          <Button asChild variant="outline" size="sm" className="mt-5"><Link to="/settings">{attempt.exam_date ? "Update study preferences" : "Set exam date"} <ArrowUpRight /></Link></Button>
         </Panel>
       </div>
 

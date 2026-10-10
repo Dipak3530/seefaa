@@ -24,13 +24,13 @@ function CurriculumPage() {
       <PageHeader title="CFA Curriculum" subtitle="CFA Level I · 2027. Ten subjects, tracked module by module." />
       <div className="relative mb-6 max-w-md">
         <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input className="bg-card pl-9" placeholder="Search modules and LOS…" value={q} onChange={(e) => setQ(e.target.value)} />
+         <Input className="bg-card pl-9" aria-label="Search curriculum" placeholder="Search modules and LOS…" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
       {q.trim().length > 1 ? (
         <div className="card-soft divide-y">
           {[...hits.map((m) => ({ id: m.id, sid: m.subject_id, text: m.title, tag: "Module" })), ...losHits.map((l) => ({ id: l.id, sid: cur.module(l.module_id)?.subject_id ?? "", text: `${l.code} ${l.statement}`, tag: "LOS" }))].map((h) => (
-            <Link key={h.id} to="/curriculum/$subjectId" params={{ subjectId: h.sid }} className="flex items-center justify-between p-3 text-sm hover:bg-muted">
-              <span>{h.text}</span><span className="text-xs text-muted-foreground">{h.tag} · {cur.subject(h.sid)?.short_name}</span>
+            <Link key={h.id} to="/curriculum/$subjectId" params={{ subjectId: h.sid }} className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 p-3 text-sm hover:bg-muted">
+              <span className="min-w-0 break-words">{h.text}</span><span className="text-xs text-muted-foreground">{h.tag} · {cur.subject(h.sid)?.short_name}</span>
             </Link>
           ))}
           {!hits.length && !losHits.length && <p className="p-4 text-sm text-muted-foreground">No matches.</p>}
@@ -51,6 +51,7 @@ function CurriculumPage() {
                 <p className="mb-5 mt-2 text-xs text-muted-foreground">{mods.length} modules · ~{s.est_hours}h {plan?.status === "active" && <span className="ml-1 font-bold text-primary">· Studying</span>}</p>
                 <Bar value={(d / Math.max(1, mods.length)) * 100} className="mt-auto" />
                 <div className="mt-2 flex justify-between text-xs"><span className="text-muted-foreground">{d}/{mods.length} complete</span><span className="font-bold text-primary">{Math.round(d / Math.max(1, mods.length) * 100)}%</span></div>
+                 <p className="mt-2 text-xs text-muted-foreground">{mods.filter(m => prog.modules.some(p => p.module_id === m.id && p.status === "in_progress")).length} in progress</p>
               </Link>
             );
           })}

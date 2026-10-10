@@ -37,15 +37,20 @@ export function TimerStartButtons() {
   const inv = useInvalidate();
   const [subject, setSubject] = useState("");
   const [module, setModule] = useState("");
+  const [starting, setStarting] = useState<"study" | "revision" | null>(null);
 
   async function start(kind: "study" | "revision") {
     if (open) {
       toast.warning("A session is already active. Pause or finish it first.");
       return;
     }
+    if (starting) return;
+    setStarting(kind);
+    try {
     const { data: u } = await supabase.auth.getUser();
+    if (!u.user) { toast.error("Please sign in again to start a session."); return; }
     const { error } = await supabase.from("timer_sessions").insert({
-      user_id: u.user!.id,
+      user_id: u.user.id,
       attempt_id: attempt?.id ?? null,
       kind,
       subject_id: subject || null,
@@ -53,6 +58,7 @@ export function TimerStartButtons() {
     });
     if (error) toast.error(error.message.includes("one_open_timer") ? "Another session is already running." : error.message);
     inv("timer-open", "dashboard");
+    } finally { setStarting(null); }
   }
 
   return (
@@ -68,10 +74,10 @@ export function TimerStartButtons() {
         </NativeSelect>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <Button size="lg" className="h-12 min-w-0 px-2 text-xs sm:text-sm" onClick={() => start("study")} disabled={!!open}>
+        <Button size="lg" className="h-12 min-w-0 px-2 text-xs sm:text-sm" onClick={() => start("study")} disabled={!!open || !!starting} loading={starting === "study"}>
           <BookOpen className="h-4 w-4" /> Start Studying
         </Button>
-        <Button size="lg" variant="outline" className="h-12 min-w-0 border-primary px-2 text-xs text-primary sm:text-sm" onClick={() => start("revision")} disabled={!!open}>
+        <Button size="lg" variant="info" className="h-12 min-w-0 px-2 text-xs sm:text-sm" onClick={() => start("revision")} disabled={!!open || !!starting} loading={starting === "revision"}>
           <RotateCcw className="h-4 w-4" /> Start Revision
         </Button>
       </div>
@@ -90,18 +96,20 @@ export function TimerPanel() {
   const secs = activeSeconds(s, now);
 
   async function act(action: "pause" | "resume" | "finish") {
-    const { error } = await supabase.rpc("timer_action", { _id: s!.id, _action: action, ...(action === "finish" && notes ? { _notes: notes } : {}) });
+    if (!s) return;
+    const { error } = await supabase.rpc("timer_action", { _id: s.id, _action: action, ...(action === "finish" && notes ? { _notes: notes } : {}) });
     if (error) return toast.error(error.message);
     if (action === "finish") {
-      toast.success(`Saved ${fmtHMS(secs)} of ${s!.kind === "study" ? "study" : "revision"} time`);
+      toast.success(`Saved ${fmtHMS(secs)} of ${s.kind === "study" ? "study" : "revision"} time`);
       setFinishing(false);
       setNotes("");
     }
     inv("timer-open", "dashboard", "analytics");
   }
   async function discard() {
+    if (!s) return;
     if (!confirm("Discard this session? The recorded time will not be saved.")) return;
-    await supabase.from("timer_sessions").delete().eq("id", s!.id);
+    await supabase.from("timer_sessions").delete().eq("id", s.id);
     inv("timer-open", "dashboard");
   }
 
