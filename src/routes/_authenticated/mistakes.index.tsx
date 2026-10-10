@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -12,7 +13,7 @@ import { ERROR_CATEGORIES, categoryLabel, fmtDate } from "@/lib/cfa";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/mistakes/")({
-  head: () => ({ meta: [{ title: "My Mistake Bank — SEEFAA" }, { name: "description", content: "Your private bank of questions to practise." }] }),
+  head: () => ({ meta: pageMeta("My Mistake Bank — SEEFAA", "Your private bank of questions to practise.") }),
   component: Bank,
 });
 

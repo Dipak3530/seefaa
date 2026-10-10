@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
@@ -12,7 +13,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   validateSearch: z.object({ welcome: z.boolean().optional() }),
-  head: () => ({ meta: [{ title: "Dashboard — SEEFAA" }, { name: "description", content: "Your CFA Level I day at a glance." }] }),
+  head: () => ({ meta: pageMeta("Dashboard — SEEFAA", "Your CFA Level I day at a glance.") }),
   component: Dashboard,
 });
 

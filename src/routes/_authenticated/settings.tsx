@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -15,7 +16,7 @@ import { WEEKDAYS, fmtDate, ETHICS_ID } from "@/lib/cfa";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({ meta: [{ title: "Profile & Settings — SEEFAA" }, { name: "description", content: "Exam attempts, study preferences, reminders and your data." }] }),
+  head: () => ({ meta: pageMeta("Profile & Settings — SEEFAA", "Exam attempts, study preferences, reminders and your data.") }),
   component: Settings,
 });
 

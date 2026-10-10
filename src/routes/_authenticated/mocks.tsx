@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -13,7 +14,7 @@ import { useAttempt, useCurriculum, useInvalidate } from "@/hooks/use-seefaa";
 import { fmtDate, isoDate } from "@/lib/cfa";
 
 export const Route = createFileRoute("/_authenticated/mocks")({
-  head: () => ({ meta: [{ title: "Mock Exams — SEEFAA" }, { name: "description", content: "Track mock exam scores over time." }] }),
+  head: () => ({ meta: pageMeta("Mock Exams — SEEFAA", "Track mock exam scores over time.") }),
   component: Mocks,
 });
 

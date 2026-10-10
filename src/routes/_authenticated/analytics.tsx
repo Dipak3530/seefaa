@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -12,7 +13,7 @@ import { useAttempt, useCurriculum, useProgress } from "@/hooks/use-seefaa";
 import { activeSeconds, addDays, categoryLabel, fmtHours, isoDate } from "@/lib/cfa";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
-  head: () => ({ meta: [{ title: "Analytics — SEEFAA" }, { name: "description", content: "Progress, accuracy, time and mistake analytics from your real data." }] }),
+  head: () => ({ meta: pageMeta("Analytics — SEEFAA", "Progress, accuracy, time and mistake analytics from your real data.") }),
   component: Analytics,
 });
 

@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowUpRight, BookOpen, Search } from "lucide-react";
@@ -6,7 +7,7 @@ import { PageHeader, Bar } from "@/components/seefaa/bits";
 import { useCurriculum, useProgress } from "@/hooks/use-seefaa";
 
 export const Route = createFileRoute("/_authenticated/curriculum/")({
-  head: () => ({ meta: [{ title: "CFA Curriculum — SEEFAA" }, { name: "description", content: "Track every CFA Level I subject and module." }] }),
+  head: () => ({ meta: pageMeta("CFA Curriculum — SEEFAA", "Track every CFA Level I subject and module.") }),
   component: CurriculumPage,
 });
 

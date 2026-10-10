@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -12,7 +13,7 @@ import { applyPlan, proposePlan } from "@/lib/plan-actions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
-  head: () => ({ meta: [{ title: "Set up your plan — SEEFAA" }, { name: "description", content: "A few questions to personalize your CFA Level I plan." }] }),
+  head: () => ({ meta: pageMeta("Set up your plan — SEEFAA", "A few questions to personalize your CFA Level I plan.") }),
   component: Onboarding,
 });
 

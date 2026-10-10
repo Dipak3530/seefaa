@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -15,7 +16,7 @@ import { feasibility, type PlanTask } from "@/lib/planner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/plan")({
-  head: () => ({ meta: [{ title: "My Study Plan — SEEFAA" }, { name: "description", content: "Your adaptive CFA Level I study plan." }] }),
+  head: () => ({ meta: pageMeta("My Study Plan — SEEFAA", "Your adaptive CFA Level I study plan.") }),
   component: PlanPage,
 });
 

@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -11,7 +12,7 @@ import { useAttempt, useCurriculum, useInvalidate } from "@/hooks/use-seefaa";
 import { fmtDate, isoDate } from "@/lib/cfa";
 
 export const Route = createFileRoute("/_authenticated/practice")({
-  head: () => ({ meta: [{ title: "Practice Sessions — SEEFAA" }, { name: "description", content: "Record and compare your practice results." }] }),
+  head: () => ({ meta: pageMeta("Practice Sessions — SEEFAA", "Record and compare your practice results.") }),
   component: Practice,
 });
 

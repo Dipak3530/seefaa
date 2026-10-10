@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -10,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/curriculum/$subjectId")({
-  head: () => ({ meta: [{ title: "Subject progress — SEEFAA" }, { name: "description", content: "Modules, LOS, confidence and revision checkpoints for this subject." }] }),
+  head: () => ({ meta: pageMeta("Subject progress — SEEFAA", "Modules, LOS, confidence and revision checkpoints for this subject.") }),
   component: SubjectPage,
 });
 

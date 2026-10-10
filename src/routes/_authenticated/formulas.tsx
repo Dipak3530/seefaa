@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -16,7 +17,7 @@ import { cn } from "@/lib/utils";
 import type { Tables } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/formulas")({
-  head: () => ({ meta: [{ title: "Formula Notebook — SEEFAA" }, { name: "description", content: "Your personal CFA formula and concept notebook." }] }),
+  head: () => ({ meta: pageMeta("Formula Notebook — SEEFAA", "Your personal CFA formula and concept notebook.") }),
   component: Formulas,
 });
 
