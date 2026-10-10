@@ -123,11 +123,11 @@ function PlanPage() {
                   <ul className="space-y-1">
                     {list.map((t) => (
                       <li key={t.id}>
-                        <button onClick={() => toggle(t.id, !t.done)} className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted">
+                         <Button variant="ghost" onClick={() => toggle(t.id, !t.done)} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] gap-2 whitespace-normal rounded-md border border-border bg-card px-3 py-3 text-left text-sm hover:bg-muted">
                           {t.done ? <CheckCircle2 className="h-4 w-4 text-success" /> : <Circle className={cn("h-4 w-4", t.task_date < today ? "text-destructive" : "text-muted-foreground")} />}
-                          <span className={cn("flex-1", t.done && "line-through text-muted-foreground")}>{t.title}</span>
-                          <span className="text-xs text-muted-foreground">{t.kind} · {t.minutes}m</span>
-                        </button>
+                           <span className={cn("min-w-0", t.done && "line-through text-muted-foreground")}>{t.title}<span className="mt-1 block text-[10px] uppercase text-primary">{t.kind}</span></span>
+                           <span className="text-xs text-muted-foreground">{t.minutes}m</span>
+                         </Button>
                       </li>
                     ))}
                   </ul>

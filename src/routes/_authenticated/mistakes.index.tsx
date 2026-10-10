@@ -54,7 +54,7 @@ function Bank() {
           <Button variant="outline" onClick={exportCsv} disabled={!list.length}><Download className="mr-2 h-4 w-4" />Export</Button>
           <Button onClick={() => setQuiz(true)} disabled={!list.length}><Play className="mr-2 h-4 w-4" />Quiz me ({Math.min(20, list.length)})</Button>
         </>} />
-      <div className="card-soft mb-4 grid gap-2 p-3 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="mb-6 grid gap-2 border-y py-4 sm:grid-cols-3 lg:grid-cols-6">
         <div className="relative sm:col-span-3 lg:col-span-1"><Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" /><Input className="pl-8" placeholder="Search" value={q} onChange={(e) => setQ(e.target.value)} /></div>
         <NativeSelect value={subject} onChange={(e) => { setSubject(e.target.value); setModule(""); }}><option value="">All subjects</option>{cur.subjects.map((s) => <option key={s.id} value={s.id}>{s.short_name}</option>)}</NativeSelect>
         <NativeSelect value={module} onChange={(e) => setModule(e.target.value)} disabled={!subject}><option value="">All modules</option>{cur.modulesOf(subject).map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}</NativeSelect>
@@ -70,9 +70,9 @@ function Bank() {
           {list.map((m) => (
             <Link key={m.id} to="/mistakes/$id" params={{ id: m.id }} className="card-soft block p-4 transition hover:-translate-y-0.5">
               <div className="mb-2 flex flex-wrap items-center gap-1.5 text-[11px]">
-                <span className="rounded-full bg-secondary px-2 py-0.5">{cur.subject(m.subject_id)?.short_name}</span>
-                <span className="rounded-full bg-muted px-2 py-0.5">{categoryLabel(m.error_category)}</span>
-                <span className={cn("rounded-full px-2 py-0.5", m.mastery === "mastered" ? "bg-success/20" : "bg-sun/30")}>{m.mastery === "mastered" ? "Mastered" : m.mastery === "new" ? "New" : "Needs practice"}</span>
+                <span className="rounded-md bg-secondary px-2 py-1">{cur.subject(m.subject_id)?.short_name}</span>
+                <span className="rounded-md bg-muted px-2 py-1">{categoryLabel(m.error_category)}</span>
+                <span className={cn("rounded-md px-2 py-1", m.mastery === "mastered" ? "bg-primary text-primary-foreground" : "bg-background")}>{m.mastery === "mastered" ? "Mastered" : m.mastery === "new" ? "New" : "Needs practice"}</span>
                 {m.source === "ai" && <span className="rounded-full bg-primary/15 px-2 py-0.5">AI-generated</span>}
               </div>
               <p className="line-clamp-3 text-sm">{m.question}</p>

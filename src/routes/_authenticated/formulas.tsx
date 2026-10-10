@@ -87,7 +87,7 @@ function Formulas() {
                   </div>
                   <button onClick={() => patch(f.id, { favorite: !f.favorite })} aria-label="Favourite"><Star className={cn("h-5 w-5", f.favorite ? "fill-sun text-sun" : "text-muted-foreground")} /></button>
                 </div>
-                <p className="my-3 rounded-lg bg-muted p-3 font-mono text-sm">{f.expression}</p>
+                <p className="my-4 overflow-x-auto rounded-md border bg-background p-4 font-mono text-base">{f.expression}</p>
                 <dl className="space-y-1.5 text-sm">{FIELDS.filter(([k]) => f[k]).map(([k, l]) => <div key={k}><dt className="text-xs font-medium text-muted-foreground">{l}</dt><dd className="whitespace-pre-wrap">{String(f[k])}</dd></div>)}</dl>
                 {f.tags.length > 0 && <div className="mt-2 flex flex-wrap gap-1">{f.tags.map((t) => <span key={t} className="rounded bg-secondary px-1.5 text-[11px]">#{t}</span>)}</div>}
                 {ex && <details className="mt-3 rounded-lg border p-3"><summary className="cursor-pointer text-sm font-medium text-primary">AI explanation</summary><div className="mt-2"><Markdown>{ex.content}</Markdown></div></details>}
