@@ -1,4 +1,8 @@
 # SEEFAA roadmap
+- [ ] Polish shared comic button variants and interaction states without replacing existing workflows
+- [ ] Prioritise daily study actions, saved preparation progress, and next tasks on dashboard
+- [ ] Improve curriculum search, status visibility, and long-title readability
+- [ ] Verify updated signed-in screens and existing timer flow
 - [x] Apply reference-inspired tactile comic buttons and shared theme; verified signed-in study pages, desktop/mobile layouts and navigation
 - [x] Reject stale optimized React hashes to prevent separate hook dispatchers; verified public and signed-in pages without runtime errors
 - [x] Editorial redesign: global cream/coral design system and landing page
