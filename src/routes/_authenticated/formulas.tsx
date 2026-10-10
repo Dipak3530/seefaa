@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PageHeader, Empty, NativeSelect, Markdown } from "@/components/seefaa/bits";
 import { useCurriculum } from "@/hooks/use-seefaa";
-import { explainFormula } from "@/server/ai.functions";
+import { explainFormula } from "@/lib/ai.functions";
 import { cn } from "@/lib/utils";
 import type { Tables } from "@/integrations/supabase/types";
 
