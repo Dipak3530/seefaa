@@ -17,6 +17,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in or create your SEEFAA account to start your CFA Level I plan." },
       { property: "og:title", content: "Sign in — SEEFAA" },
       { property: "og:description", content: "Access your private CFA Level I study space." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AuthPage,
@@ -67,10 +69,11 @@ function AuthPage() {
   }
 
   return (
-    <div className="sky-bg flex min-h-screen items-center justify-center px-4">
-      <div className="card-soft w-full max-w-md p-8">
+    <div className="sky-bg flex min-h-screen items-center justify-center px-4 py-10">
+      <div className="card-soft editorial-shadow w-full max-w-md border-foreground p-8">
         <Logo />
-        <h1 className="mt-6 text-2xl font-semibold">
+        <p className="mt-7 text-xs font-bold uppercase text-primary">Your next chapter starts here.</p>
+        <h1 className="mt-2 text-3xl font-bold">
           {mode === "signup" ? "Create your account" : mode === "forgot" ? "Reset your password" : "Welcome back"}
         </h1>
         <form onSubmit={submit} className="mt-6 space-y-4">
@@ -92,11 +95,11 @@ function AuthPage() {
         <div className="mt-6 flex justify-between text-sm">
           {mode === "signin" ? (
             <>
-              <button className="text-primary" onClick={() => setMode("signup")}>Create account</button>
-              <button className="text-muted-foreground" onClick={() => setMode("forgot")}>Forgot password?</button>
+              <Button variant="link" className="px-0" onClick={() => setMode("signup")}>Create account</Button>
+              <Button variant="ghost" className="px-0 text-muted-foreground" onClick={() => setMode("forgot")}>Forgot password?</Button>
             </>
           ) : (
-            <button className="text-primary" onClick={() => setMode("signin")}>Back to sign in</button>
+            <Button variant="link" className="px-0" onClick={() => setMode("signin")}>Back to sign in</Button>
           )}
         </div>
       </div>

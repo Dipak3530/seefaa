@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -15,7 +16,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/revision")({
-  head: () => ({ meta: [{ title: "Revision Centre — SEEFAA" }, { name: "description", content: "Today's due and overdue reviews." }] }),
+  head: () => ({ meta: pageMeta("Revision Centre — SEEFAA", "Today's due and overdue reviews.") }),
   component: Revision,
 });
 

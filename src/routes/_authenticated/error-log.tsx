@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -17,7 +18,7 @@ import { extractQuestion } from "@/lib/ai.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/error-log")({
-  head: () => ({ meta: [{ title: "Error Log — SEEFAA" }, { name: "description", content: "Paste a screenshot of a question you got wrong." }] }),
+  head: () => ({ meta: pageMeta("Error Log — SEEFAA", "Paste a screenshot of a question you got wrong.") }),
   component: ErrorLog,
 });
 

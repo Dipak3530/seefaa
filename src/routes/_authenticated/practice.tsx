@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -11,7 +12,7 @@ import { useAttempt, useCurriculum, useInvalidate } from "@/hooks/use-seefaa";
 import { fmtDate, isoDate } from "@/lib/cfa";
 
 export const Route = createFileRoute("/_authenticated/practice")({
-  head: () => ({ meta: [{ title: "Practice Sessions — SEEFAA" }, { name: "description", content: "Record and compare your practice results." }] }),
+  head: () => ({ meta: pageMeta("Practice Sessions — SEEFAA", "Record and compare your practice results.") }),
   component: Practice,
 });
 
@@ -62,7 +63,7 @@ function Practice() {
       <Panel title="History">
         {!list?.length ? <Empty icon={<Target />} title="No practice sessions yet" body="Record your first set of questions above." /> : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+             <table className="w-full min-w-[640px] text-sm">
               <thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="py-2">Date</th><th>Subject / module</th><th>Score</th><th>Accuracy</th><th>Time</th><th>Source</th><th /></tr></thead>
               <tbody>
                 {list.map((p) => (
@@ -70,7 +71,7 @@ function Practice() {
                     <td className="py-2">{fmtDate(p.session_date)}</td>
                     <td>{cur.subject(p.subject_id)?.short_name ?? "—"}{p.module_id ? ` · ${cur.module(p.module_id)?.title}` : ""}</td>
                     <td>{p.correct}/{p.total}</td>
-                    <td className="font-medium">{Math.round((p.correct / p.total) * 100)}%</td>
+                    <td className="font-bold text-primary">{Math.round((p.correct / p.total) * 100)}%</td>
                     <td>{p.minutes ? `${p.minutes}m` : "—"}</td>
                     <td className="text-muted-foreground">{p.source ?? "—"}</td>
                     <td><Button size="icon" variant="ghost" onClick={() => del(p.id)} aria-label="Delete"><Trash2 className="h-4 w-4" /></Button></td>

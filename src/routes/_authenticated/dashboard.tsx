@@ -1,7 +1,8 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
-import { Camera, CalendarClock, CheckCircle2, Circle, Flame, RefreshCw } from "lucide-react";
+import { ArrowUpRight, Camera, CalendarClock, CheckCircle2, Circle, Flame, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { PageHeader, Panel, Stat, Bar, Empty } from "@/components/seefaa/bits";
@@ -12,7 +13,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   validateSearch: z.object({ welcome: z.boolean().optional() }),
-  head: () => ({ meta: [{ title: "Dashboard — SEEFAA" }, { name: "description", content: "Your CFA Level I day at a glance." }] }),
+  head: () => ({ meta: pageMeta("Dashboard — SEEFAA", "Your CFA Level I day at a glance.") }),
   component: Dashboard,
 });
 
@@ -30,11 +31,12 @@ function Dashboard() {
     queryKey: ["dashboard", attempt?.id, today],
     enabled: !!attempt,
     queryFn: async () => {
+      if (!attempt) return { tasks: [], overdue: 0, revs: 0, mistakesDue: 0, timers: [], recent: [] };
       const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
       const [tasks, overdue, revs, mistakesDue, timers, recent] = await Promise.all([
-        supabase.from("study_tasks").select("*").eq("attempt_id", attempt!.id).eq("task_date", today).order("kind"),
-        supabase.from("study_tasks").select("id", { count: "exact", head: true }).eq("attempt_id", attempt!.id).eq("done", false).lt("task_date", today),
-        supabase.from("revision_checkpoints").select("id", { count: "exact", head: true }).eq("attempt_id", attempt!.id).is("completed_at", null).lte("due_date", today),
+        supabase.from("study_tasks").select("*").eq("attempt_id", attempt.id).eq("task_date", today).order("kind"),
+        supabase.from("study_tasks").select("id", { count: "exact", head: true }).eq("attempt_id", attempt.id).eq("done", false).lt("task_date", today),
+        supabase.from("revision_checkpoints").select("id", { count: "exact", head: true }).eq("attempt_id", attempt.id).is("completed_at", null).lte("due_date", today),
         supabase.from("mistakes").select("id", { count: "exact", head: true }).neq("mastery", "mastered").lte("next_review", today),
         supabase.from("timer_sessions").select("*").gte("started_at", startOfDay.toISOString()),
         supabase.from("mistakes").select("id, question, subject_id, created_at").order("created_at", { ascending: false }).limit(4),
@@ -72,36 +74,23 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title={`Hello${profile?.display_name ? `, ${profile.display_name}` : ""}`} subtitle={`Studying now: ${activeSubjects.join(" · ") || "—"}`} />
+      <PageHeader title={`Hello${profile?.display_name ? `, ${profile.display_name}` : ""}. Let's make progress.`} subtitle={`Studying now: ${activeSubjects.join(" · ") || "—"}`} actions={<Button asChild variant="outline"><Link to="/plan">Your study plan <ArrowUpRight /></Link></Button>} />
       {welcome && (
         <div className="rounded-xl border border-primary/30 bg-accent p-4 text-sm">
           <b>Your plan is live.</b> Got a question wrong? Hit <b>Log a Mistake</b> and paste the screenshot. Mark modules done in <Link to="/curriculum" className="text-primary underline">CFA Curriculum</Link> and your revisions appear in the <Link to="/revision" className="text-primary underline">Revision Centre</Link>.
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Link to="/error-log" className="group card-soft flex items-center gap-5 bg-deep p-6 text-deep-foreground transition hover:-translate-y-0.5 lg:col-span-2">
-          <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-sun text-sun-foreground"><Camera className="h-8 w-8" /></span>
-          <div>
-            <p className="font-display text-2xl font-semibold">Log a Mistake</p>
-            <p className="mt-1 text-sm opacity-85">Paste a screenshot (Ctrl/Cmd + V), drop it, or upload. AI reads the question for you.</p>
-          </div>
-        </Link>
-        <Link to="/revision" className="card-soft flex flex-col justify-center p-6 transition hover:-translate-y-0.5">
-          <RefreshCw className="h-6 w-6 text-primary" />
-          <p className="mt-2 font-display text-lg font-semibold">Today's revision</p>
-          <p className="text-sm text-muted-foreground">{(data?.revs ?? 0) + (data?.mistakesDue ?? 0)} reviews due</p>
-        </Link>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
         <Stat tone="deep" label="Exam countdown" value={daysToExam == null ? "No date" : daysToExam >= 0 ? `${daysToExam} days` : "Passed"} hint={attempt.exam_date ? fmtDate(attempt.exam_date) : "Add it in Settings"} />
         <Stat label="Syllabus complete" value={`${pct}%`} hint={`${doneModules}/${totalModules} modules · ${studyPhase(daysToExam, pct)}`} />
+        <Stat label="Study time today" value={fmtHours(studySecs)} hint="Time invested in understanding" />
+        <Stat label="Revision time today" value={fmtHours(revSecs)} hint="Make what you've learned stick" />
         <Stat label="Target completion" value={daysToTarget == null ? "—" : `${daysToTarget} days`} hint={eta ? `At your pace: ${fmtDate(eta)}` : "Not enough data for an estimate"} />
         <Stat tone="sun" label="XP · streak" value={<span className="flex items-center gap-2">{xp?.total ?? 0}<Flame className="h-5 w-5" />{streak}</span>} hint="Days in a row with learning activity" />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-5">
+      <div className="grid gap-6 border-b pb-6 lg:grid-cols-5">
         <Panel title="Today's plan" className="lg:col-span-3" action={<Button asChild size="sm" variant="ghost"><Link to="/plan">Full plan</Link></Button>}>
           {data?.overdue ? <p className="mb-3 rounded-md bg-sun/25 px-3 py-2 text-xs"><CalendarClock className="mr-1 inline h-3.5 w-3.5" />{data.overdue} earlier task(s) still open — they're kept on your plan as catch-up.</p> : null}
           {!data?.tasks.length ? (
@@ -110,18 +99,18 @@ function Dashboard() {
             <ul className="space-y-2">
               {data.tasks.map((t) => (
                 <li key={t.id}>
-                  <button onClick={() => toggleTask(t.id, !t.done)} className="flex w-full items-center gap-3 rounded-lg border p-3 text-left hover:bg-muted">
+                  <Button variant="ghost" onClick={() => toggleTask(t.id, !t.done)} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] gap-3 whitespace-normal rounded-lg border bg-card p-3 text-left hover:bg-muted">
                     {t.done ? <CheckCircle2 className="h-5 w-5 text-success" /> : <Circle className="h-5 w-5 text-muted-foreground" />}
-                    <span className={cn("flex-1 text-sm", t.done && "text-muted-foreground line-through")}>{t.title}</span>
-                    <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", t.kind === "ethics" ? "bg-sun/40" : "bg-secondary")}>{t.kind}</span>
+                    <span className={cn("min-w-0 text-sm", t.done && "text-muted-foreground line-through")}>{t.title}<span className="mt-1 block text-[10px] font-medium uppercase text-primary">{t.kind}</span></span>
                     <span className="text-xs text-muted-foreground">{t.minutes}m</span>
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>
           )}
         </Panel>
         <Panel title="Study timer" className="lg:col-span-2">
+          <p className="mb-4 text-sm font-semibold">{data?.tasks.find(t => !t.done)?.title || "Your next concept starts here."}</p>
           <TimerStartButtons />
           <div className="mt-4 grid grid-cols-3 gap-2 text-center text-sm">
             <div className="rounded-lg bg-muted p-2"><p className="text-xs text-muted-foreground">Study</p><p className="font-semibold">{fmtHours(studySecs)}</p></div>
@@ -129,6 +118,11 @@ function Dashboard() {
             <div className="rounded-lg bg-muted p-2"><p className="text-xs text-muted-foreground">Total today</p><p className="font-semibold">{fmtHours(studySecs + revSecs)}</p></div>
           </div>
         </Panel>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Link to="/error-log" className="card-soft grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 p-5 transition hover:border-primary"><span className="grid h-11 w-11 place-items-center rounded-lg bg-accent text-primary"><Camera className="h-5 w-5" /></span><div className="min-w-0"><p className="font-display text-base font-bold">Turn a mistake into progress.</p><p className="mt-1 text-xs text-muted-foreground">Log a question and give it another chance.</p></div><ArrowUpRight className="h-5 w-5 text-primary" /></Link>
+        <Link to="/revision" className="card-soft grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 p-5 transition hover:border-primary"><span className="grid h-11 w-11 place-items-center rounded-lg bg-accent text-primary"><RefreshCw className="h-5 w-5" /></span><div className="min-w-0"><p className="font-display text-base font-bold">Today's revision</p><p className="mt-1 text-xs text-muted-foreground">{(data?.revs ?? 0) + (data?.mistakesDue ?? 0)} reviews due · keep your knowledge fresh</p></div><ArrowUpRight className="h-5 w-5 text-primary" /></Link>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

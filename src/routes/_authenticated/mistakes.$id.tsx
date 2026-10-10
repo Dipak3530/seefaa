@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -17,7 +18,7 @@ import type { TablesUpdate } from "@/integrations/supabase/types";
 import { explainMistake } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/_authenticated/mistakes/$id")({
-  head: () => ({ meta: [{ title: "Mistake — SEEFAA" }, { name: "description", content: "Review, explain and retry a logged mistake." }] }),
+  head: () => ({ meta: pageMeta("Mistake — SEEFAA", "Review, explain and retry a logged mistake.") }),
   component: MistakeDetail,
 });
 

@@ -13,6 +13,11 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
-    optimizeDeps: { include: ["recharts"] },
+    optimizeDeps: {
+      include: ["recharts"],
+      // Reject stale optimizer hashes instead of serving React at two URLs.
+      // Vite then reloads the page with one shared React dispatcher.
+      ignoreOutdatedRequests: false,
+    },
   },
 });

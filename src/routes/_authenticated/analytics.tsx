@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -12,7 +13,7 @@ import { useAttempt, useCurriculum, useProgress } from "@/hooks/use-seefaa";
 import { activeSeconds, addDays, categoryLabel, fmtHours, isoDate } from "@/lib/cfa";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
-  head: () => ({ meta: [{ title: "Analytics — SEEFAA" }, { name: "description", content: "Progress, accuracy, time and mistake analytics from your real data." }] }),
+  head: () => ({ meta: pageMeta("Analytics — SEEFAA", "Progress, accuracy, time and mistake analytics from your real data.") }),
   component: Analytics,
 });
 
@@ -100,7 +101,7 @@ function Analytics() {
         <div className="h-64"><ResponsiveContainer><BarChart data={timeData}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" /><XAxis dataKey="k" fontSize={11} /><YAxis fontSize={11} unit="h" /><Tooltip /><Legend />
           <RBar dataKey="study" name="Study" stackId="a" fill="var(--color-primary)" /><RBar dataKey="revision" name="Revision" stackId="a" fill="var(--color-sun)" />
-          <RBar dataKey="planned" name="Planned" fill="var(--color-chart-5)" />
+          <RBar dataKey="planned" name="Planned" fill="var(--color-chart-4)" />
         </BarChart></ResponsiveContainer></div>
       </Panel>
 

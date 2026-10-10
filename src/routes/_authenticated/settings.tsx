@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -15,7 +16,7 @@ import { WEEKDAYS, fmtDate, ETHICS_ID } from "@/lib/cfa";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({ meta: [{ title: "Profile & Settings — SEEFAA" }, { name: "description", content: "Exam attempts, study preferences, reminders and your data." }] }),
+  head: () => ({ meta: pageMeta("Profile & Settings — SEEFAA", "Exam attempts, study preferences, reminders and your data.") }),
   component: Settings,
 });
 
@@ -126,7 +127,7 @@ function Settings() {
               {([["daily", "Daily study tasks"], ["revisions", "Due & overdue revisions"], ["weekly", "Weekly progress summary"]] as const).map(([k, l]) => (
                 <label key={k} className="flex items-center justify-between text-sm">{l}<Switch checked={p.rem[k]} onCheckedChange={(v) => setP({ ...p, rem: { ...p.rem, [k]: v } })} /></label>
               ))}
-              <div className="flex items-center gap-2 text-sm">Quiet hours <Input type="time" className="w-28" value={p.rem.quiet_start} onChange={(e) => setP({ ...p, rem: { ...p.rem, quiet_start: e.target.value } })} /> to <Input type="time" className="w-28" value={p.rem.quiet_end} onChange={(e) => setP({ ...p, rem: { ...p.rem, quiet_end: e.target.value } })} /></div>
+              <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 text-sm"><span className="col-span-3 text-xs font-medium">Quiet hours</span><Input type="time" className="min-w-0 w-full" value={p.rem.quiet_start} onChange={(e) => setP({ ...p, rem: { ...p.rem, quiet_start: e.target.value } })} /> to <Input type="time" className="min-w-0 w-full" value={p.rem.quiet_end} onChange={(e) => setP({ ...p, rem: { ...p.rem, quiet_end: e.target.value } })} /></div>
             </div>
             <Button onClick={saveProfile}>Save preferences</Button>
           </div>

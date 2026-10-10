@@ -1,3 +1,4 @@
+import { pageMeta } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -9,7 +10,7 @@ import { useProfile, useXp } from "@/hooks/use-seefaa";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/leaderboard")({
-  head: () => ({ meta: [{ title: "Leaderboard — SEEFAA" }, { name: "description", content: "Opt-in XP leaderboard and your achievements." }] }),
+  head: () => ({ meta: pageMeta("Leaderboard — SEEFAA", "Opt-in XP leaderboard and your achievements.") }),
   component: Leaderboard,
 });
 
