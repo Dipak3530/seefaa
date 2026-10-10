@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { PageHeader, Panel, Stat, Bar, Empty } from "@/components/seefaa/bits";
 import { TimerStartButtons } from "@/components/seefaa/timer";
+import { QuestionText } from "@/components/seefaa/question";
 import { useAttempt, useCurriculum, useInvalidate, useProfile, useProgress, useXp } from "@/hooks/use-seefaa";
 import { activeSeconds, daysBetween, fmtDate, fmtHours, isoDate, studyPhase, addDays } from "@/lib/cfa";
 import { cn } from "@/lib/utils";
@@ -161,7 +162,7 @@ function Dashboard() {
               {data.recent.map((m) => (
                 <li key={m.id}>
                   <Link to="/mistakes/$id" params={{ id: m.id }} className="block rounded-lg border p-3 text-sm hover:bg-muted">
-                    <span className="line-clamp-2">{m.question}</span>
+                    <QuestionText text={m.question} compact />
                     <span className="mt-1 block text-xs text-muted-foreground">{cur.subject(m.subject_id)?.short_name} · {fmtDate(m.created_at)}</span>
                   </Link>
                 </li>
