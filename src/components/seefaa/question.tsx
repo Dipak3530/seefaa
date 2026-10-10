@@ -18,8 +18,8 @@ export function AnswerChoice({ label, text, state = "default", onSelect, disable
   onSelect?: () => void; disabled?: boolean;
 }) {
   const content = <>
-    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md border border-current/20 bg-card font-display text-sm font-bold">{label.replace(/[.)]$/, "")}</span>
-    <span className="min-w-0 flex-1"><QuestionText text={text} /></span>
+    <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-md border font-display text-sm font-bold", state === "correct" ? "border-info bg-info text-info-foreground" : state === "selected" || state === "incorrect" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-foreground")}>{label.replace(/[.)]$/, "")}</span>
+    <span className="min-w-0 flex-1"><QuestionText text={text} />{!onSelect && state !== "default" && <span className={cn("mt-2 block text-xs font-bold", state === "correct" ? "text-info" : "text-primary")}>{state === "correct" ? "Verified correct answer" : "Your answer"}</span>}</span>
     {state === "correct" ? <CheckCircle2 className="h-5 w-5 shrink-0" /> : state === "incorrect" ? <XCircle className="h-5 w-5 shrink-0" /> : onSelect ? <Circle className={cn("h-4 w-4 shrink-0", state === "selected" && "fill-primary text-primary")} /> : null}
   </>;
   const className = cn("question-choice flex w-full items-start gap-3 rounded-lg border bg-card p-3 text-left text-foreground sm:p-4",

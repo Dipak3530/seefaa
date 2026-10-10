@@ -150,6 +150,8 @@
 .question-prose { overflow-wrap: anywhere; color: var(--foreground); }
 .question-prose > * + * { margin-top: 1rem; }
 .question-prose p { white-space: pre-wrap; }
+.question-reading .question-prose { font-size: 1rem; line-height: 1.85; }
+.question-reading .question-prose > p:last-child:not(:first-child) { border-left: 3px solid var(--primary); padding: 1rem; background: var(--background); font-weight: 600; }
 .question-prose h1, .question-prose h2, .question-prose h3 { font-size: 1rem; font-weight: 700; }
 .question-prose ul, .question-prose ol { padding-left: 1.25rem; }
 .question-prose ul { list-style: disc; }
@@ -159,11 +161,12 @@
 .question-prose pre { overflow-x: auto; white-space: pre; }
 .question-table { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
 .question-table table { width: 100%; border-collapse: collapse; font-size: 0.875rem; line-height: 1.6; }
-.question-table th { background: var(--muted); font-weight: 700; text-align: left; white-space: nowrap; overflow-wrap: normal; }
+.question-table th { background: var(--foreground); color: var(--card); font-weight: 700; text-align: left; white-space: nowrap; overflow-wrap: normal; }
+.question-table th:last-child:not(:first-child), .question-table td:last-child:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
 .question-table th, .question-table td { padding: 0.75rem; vertical-align: top; border-bottom: 1px solid var(--border); }
 .question-table tr:last-child td { border-bottom: 0; }
 .question-table tr:nth-child(even) td { background: color-mix(in oklch, var(--muted) 35%, var(--card)); }
-.question-choice { box-shadow: none; background-image: none; }
+.question-choice { box-shadow: none; background-image: none; align-items: center; }
 .question-choice:disabled { opacity: 1; }
 .question-choice .question-prose { font-weight: 500; }
 .question-choice:hover:not(:disabled) { box-shadow: none; transform: none; }
