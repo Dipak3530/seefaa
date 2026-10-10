@@ -27,4 +27,9 @@ describe("uploaded subject-wise formula reference", () => {
   it("does not invent Ethics equations when the sheet contains only standards", () => {
     expect(REFERENCE_FORMULAS.filter((f) => f.subject === "Ethical and Professional Standards")).toHaveLength(0);
   });
+  it("includes the page-five EPS equations", () => {
+    const eps = REFERENCE_FORMULAS.filter((f) => f.name.includes("earnings per share") || f.name.startsWith("Diluted EPS"));
+    expect(eps).toHaveLength(3);
+    expect(eps.every((f) => f.subject === "Financial Statement Analysis" && f.page === 5)).toBe(true);
+  });
 });

@@ -80,6 +80,9 @@ const groups: Record<string, Entry[]> = {
     ["Double-declining-balance depreciation", "(2 / useful life) × (cost − accumulated depreciation)", 5],
     ["Units-of-production depreciation", "[(Cost − salvage value) / useful life in units] × output units", 5],
     ["Bond interest expense", "Beginning book value × market interest rate at issuance", 6],
+    ["Basic earnings per share", "Basic EPS = (net income − preferred dividends) / weighted-average common shares outstanding", 5],
+    ["Diluted earnings per share", "Diluted EPS = adjusted income available for common shares / (weighted-average common shares + potential common shares outstanding)", 5],
+    ["Diluted EPS — convertible securities", "Diluted EPS = [NI − preferred dividends + convertible preferred dividends + convertible debt interest × (1 − t)] / [weighted-average shares + shares from preferred conversion + shares from debt conversion + shares issuable from stock options]", 5, "Include dilutive securities only. Brackets normalized from the printed formula."],
   ],
   "Corporate Issuers": [
     ["Net present value", "NPV = CF₀ + Σₜ₌₁ⁿ CFt / (1 + k)ᵗ", 6, "Capital allocation appears before the Corporate Issuers heading in the sheet; grouped here by topic."],
