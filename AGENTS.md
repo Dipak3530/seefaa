@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
+- Render saved question text through the shared question surface and conservative Markdown table normalizer across detail, bank and retry views; preserve stored source text and all answer logic.
 - Keep source-attributed cheat-sheet equations in a browser-safe reference catalog separate from user-owned formulas; saving a reference uses the existing notebook form and never seeds user data on page load.
 - Keep Vite's `optimizeDeps.ignoreOutdatedRequests` false so dependency updates cannot serve React under stale and current URLs with separate hook dispatchers.
 - Shared visual tokens live in `src/styles.css`, reusable learning surfaces in `bits.tsx`, and authenticated navigation in `app-shell.tsx`; redesigns change presentation without replacing data hooks or database workflows.
