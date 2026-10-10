@@ -52,7 +52,7 @@ export function TimerStartButtons() {
       module_id: module || null,
     });
     if (error) toast.error(error.message.includes("one_open_timer") ? "Another session is already running." : error.message);
-    inv("timer-open");
+    inv("timer-open", "dashboard");
   }
 
   return (
@@ -97,12 +97,12 @@ export function TimerPanel() {
       setFinishing(false);
       setNotes("");
     }
-    inv("timer-open", "timer-sessions");
+    inv("timer-open", "dashboard", "analytics");
   }
   async function discard() {
     if (!confirm("Discard this session? The recorded time will not be saved.")) return;
     await supabase.from("timer_sessions").delete().eq("id", s!.id);
-    inv("timer-open");
+    inv("timer-open", "dashboard");
   }
 
   return (

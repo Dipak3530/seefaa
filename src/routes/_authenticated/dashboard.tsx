@@ -42,8 +42,6 @@ function Dashboard() {
       return { tasks: tasks.data ?? [], overdue: overdue.count ?? 0, revs: revs.count ?? 0, mistakesDue: mistakesDue.count ?? 0, timers: timers.data ?? [], recent: recent.data ?? [] };
     },
   });
-  const { data: timerChange } = useQuery({ queryKey: ["timer-open"], enabled: false }); // re-render on timer changes
-  void timerChange;
 
   if (!cur || !attempt || !prog) return <p className="text-muted-foreground">Loading…</p>;
   const totalModules = cur.modules.length;
