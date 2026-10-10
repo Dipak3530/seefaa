@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogD
 import { PageHeader, Panel, NativeSelect } from "@/components/seefaa/bits";
 import { useAttempt, useCurriculum, useInvalidate } from "@/hooks/use-seefaa";
 import { ERROR_CATEGORIES } from "@/lib/cfa";
-import { extractQuestion } from "@/server/ai.functions";
+import { extractQuestion } from "@/lib/ai.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/error-log")({

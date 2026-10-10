@@ -14,7 +14,7 @@ import { QuizRunner } from "@/components/seefaa/quiz";
 import { useCurriculum, useInvalidate } from "@/hooks/use-seefaa";
 import { ERROR_CATEGORIES, categoryLabel, fmtDate } from "@/lib/cfa";
 import type { TablesUpdate } from "@/integrations/supabase/types";
-import { explainMistake } from "@/server/ai.functions";
+import { explainMistake } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/_authenticated/mistakes/$id")({
   head: () => ({ meta: [{ title: "Mistake — SEEFAA" }, { name: "description", content: "Review, explain and retry a logged mistake." }] }),
