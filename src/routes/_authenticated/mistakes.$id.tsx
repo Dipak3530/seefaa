@@ -13,6 +13,7 @@ import { Panel, Markdown, NativeSelect } from "@/components/seefaa/bits";
 import { QuizRunner } from "@/components/seefaa/quiz";
 import { useCurriculum, useInvalidate } from "@/hooks/use-seefaa";
 import { ERROR_CATEGORIES, categoryLabel, fmtDate } from "@/lib/cfa";
+import type { TablesUpdate } from "@/integrations/supabase/types";
 import { explainMistake } from "@/server/ai.functions";
 
 export const Route = createFileRoute("/_authenticated/mistakes/$id")({
@@ -66,11 +67,11 @@ function MistakeDetail() {
     }
   }
   async function saveEdit() {
-    const patch: Record<string, any> = { ...form, updated_at: new Date().toISOString() };
+    const patch: TablesUpdate<"mistakes"> & Record<string, any> = { ...form, updated_at: new Date().toISOString() };
     if ("correct_answer" in form) patch.correct_verified = false;
     if ("module_id" in form && !form.module_id) patch.module_id = null;
     if ("los_id" in form && !form.los_id) patch.los_id = null;
-    const { error } = await supabase.from("mistakes").update(patch).eq("id", id);
+    const { error } = await supabase.from("mistakes").update(patch as never).eq("id", id);
     if (error) return toast.error(error.message);
     setEditing(false); setForm({}); refetch(); inv("mistakes");
   }

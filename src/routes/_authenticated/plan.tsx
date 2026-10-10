@@ -42,7 +42,7 @@ function PlanPage() {
   const feas = feasibility({ remainingMinutes: q.remainingMinutes, startDate: today, targetDate: attempt.target_completion_date, studyDays: profile.study_days, minutesPerDay: Number(profile.hours_per_day) * 60 });
 
   async function updatePlan(id: string, patch: Record<string, any>) {
-    const { error } = await supabase.from("subject_plans").update(patch).eq("id", id);
+    const { error } = await supabase.from("subject_plans").update(patch as never).eq("id", id);
     if (error) toast.error(error.message);
     inv("progress");
   }
