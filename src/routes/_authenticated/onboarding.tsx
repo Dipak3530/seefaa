@@ -126,8 +126,8 @@ function Onboarding() {
               <h2 className="text-2xl font-semibold">Study days and target</h2>
               <div className="flex flex-wrap gap-2">
                 {WEEKDAYS.map((d, i) => (
-                  <button key={d} type="button" onClick={() => setDays(days.includes(i) ? days.filter((x) => x !== i) : [...days, i])}
-                    className={cn("rounded-full border px-4 py-1.5 text-sm", days.includes(i) ? "bg-primary text-primary-foreground border-primary" : "bg-card")}>{d}</button>
+                  <Button variant={days.includes(i) ? "default" : "outline"} size="sm" aria-pressed={days.includes(i)} key={d} type="button" onClick={() => setDays(days.includes(i) ? days.filter((x) => x !== i) : [...days, i])}
+                    className={cn("rounded-full border px-4 py-1.5 text-sm", days.includes(i) ? "bg-primary text-primary-foreground border-primary" : "bg-card")}>{d}</Button>
                 ))}
               </div>
               <p className="text-sm text-muted-foreground">Unselected days are break days — no tasks, no penalties.</p>
@@ -140,8 +140,8 @@ function Onboarding() {
               <p className="text-sm text-muted-foreground">Just one for now — pick the next whenever you're ready. Ethics runs alongside automatically.</p>
               <div className="grid gap-2 sm:grid-cols-2">
                 {pickable.map((s) => (
-                  <button key={s.id} type="button" onClick={() => setFirst(s.id)}
-                    className={cn("rounded-xl border p-4 text-left text-sm font-medium transition", first === s.id ? "border-primary bg-accent ring-2 ring-primary" : "bg-card hover:bg-muted")}>{s.name}</button>
+                  <Button variant={first === s.id ? "secondary" : "outline"} aria-pressed={first === s.id} key={s.id} type="button" onClick={() => setFirst(s.id)}
+                    className={cn("h-auto justify-start whitespace-normal rounded-lg p-4 text-left text-sm", first === s.id ? "border-primary bg-accent ring-2 ring-primary" : "bg-card hover:bg-muted")}>{s.name}</Button>
                 ))}
               </div>
             </div>
@@ -162,7 +162,7 @@ function Onboarding() {
             {step < STEPS.length - 1 ? (
               <Button disabled={!canNext} onClick={() => setStep(step + 1)}>Continue</Button>
             ) : (
-              <Button disabled={busy} onClick={finish}>{busy ? "Building…" : "Create my plan"}</Button>
+              <Button loading={busy} onClick={finish}>{busy ? "Building…" : "Create my plan"}</Button>
             )}
           </div>
         </div>
@@ -173,10 +173,10 @@ function Onboarding() {
 
 function Segmented({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: [string, string][] }) {
   return (
-    <div className="inline-flex rounded-lg border bg-muted p-0.5">
+    <div className="inline-flex flex-wrap gap-2">
       {options.map(([v, l]) => (
-        <button key={v} type="button" onClick={() => onChange(value === v ? "" : v)}
-          className={cn("rounded-md px-3 py-1 text-xs font-medium", value === v ? "bg-card text-deep shadow-sm" : "text-muted-foreground")}>{l}</button>
+        <Button variant={value === v ? "secondary" : "outline"} size="sm" aria-pressed={value === v} key={v} type="button" onClick={() => onChange(value === v ? "" : v)}
+          className={cn("rounded-md px-3 py-1 text-xs font-medium", value === v ? "bg-card text-deep shadow-sm" : "text-muted-foreground")}>{l}</Button>
       ))}
     </div>
   );

@@ -211,7 +211,7 @@ function ErrorLog() {
               {images.map((img, i) => (
                 <div key={img.id} className="relative overflow-hidden rounded-xl border bg-card">
                   <img src={img.dataUrl} alt={`Screenshot ${i + 1}`} className="h-36 w-full object-contain" />
-                  <button onClick={() => setImages(images.filter((x) => x.id !== img.id))} className="absolute right-1 top-1 rounded-full bg-card p-1 shadow" aria-label="Remove image"><X className="h-4 w-4" /></button>
+                  <Button size="icon" variant="outline" onClick={() => setImages(images.filter((x) => x.id !== img.id))} className="absolute right-1 top-1" aria-label="Remove image" title="Remove image"><X className="h-4 w-4" /></Button>
                 </div>
               ))}
             </div>
@@ -236,7 +236,7 @@ function ErrorLog() {
                 {extracting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ScanText className="mr-2 h-4 w-4" />}
                 {extracting ? "Reading screenshot…" : "Scan with AI"}
               </Button>
-              {!extracted && <button className="w-full text-xs text-muted-foreground underline" onClick={() => setExtracted(true)}>or type the question manually</button>}
+              {!extracted && <Button variant="ghost" className="w-full text-xs" onClick={() => setExtracted(true)}>or type the question manually</Button>}
             </div>
           </Panel>
         </div>
@@ -281,7 +281,7 @@ function ErrorLog() {
                   </div>
                 </div>
                 <div className="space-y-1.5"><Label>Personal notes</Label><Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
-                <Button size="lg" className="w-full" onClick={() => save()} disabled={saving}>{saving ? "Saving…" : "Save mistake"}</Button>
+                <Button size="lg" className="w-full" onClick={() => save()} loading={saving}>{saving ? "Saving…" : "Save mistake"}</Button>
               </div>
             </Panel>
           )}

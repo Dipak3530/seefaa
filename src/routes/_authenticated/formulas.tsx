@@ -86,7 +86,7 @@ function Formulas() {
                     <p className="font-semibold">{f.name}</p>
                     <p className="text-xs text-muted-foreground">{cur.subject(f.subject_id)?.short_name}{f.module_id ? ` · ${cur.module(f.module_id)?.title}` : ""}</p>
                   </div>
-                  <button onClick={() => patch(f.id, { favorite: !f.favorite })} aria-label="Favourite"><Star className={cn("h-5 w-5", f.favorite ? "fill-sun text-sun" : "text-muted-foreground")} /></button>
+                  <Button size="icon" variant="ghost" onClick={() => patch(f.id, { favorite: !f.favorite })} aria-label="Favourite" title="Favourite" aria-pressed={f.favorite}><Star className={cn("h-5 w-5", f.favorite ? "fill-sun text-sun" : "text-muted-foreground")} /></Button>
                 </div>
                 <p className="my-4 overflow-x-auto rounded-md border bg-background p-4 font-mono text-base">{f.expression}</p>
                 <dl className="space-y-1.5 text-sm">{FIELDS.filter(([k]) => f[k]).map(([k, l]) => <div key={k}><dt className="text-xs font-medium text-muted-foreground">{l}</dt><dd className="whitespace-pre-wrap">{String(f[k])}</dd></div>)}</dl>

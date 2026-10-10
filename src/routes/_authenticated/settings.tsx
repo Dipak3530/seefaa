@@ -119,7 +119,7 @@ function Settings() {
           <div className="space-y-3">
             <div className="space-y-1"><Label>Display name</Label><Input value={p.display_name} onChange={(e) => setP({ ...p, display_name: e.target.value })} /></div>
             <div className="space-y-1"><Label>Hours per study day</Label><Input type="number" step={0.5} min={0.5} max={12} value={p.hours} onChange={(e) => setP({ ...p, hours: Number(e.target.value) })} /></div>
-            <div><Label>Study days</Label><div className="mt-1 flex flex-wrap gap-1.5">{WEEKDAYS.map((d, i) => <button key={d} onClick={() => setP({ ...p, days: p.days.includes(i) ? p.days.filter((x) => x !== i) : [...p.days, i] })} className={cn("rounded-full border px-3 py-1 text-xs", p.days.includes(i) ? "bg-primary text-primary-foreground" : "bg-card")}>{d}</button>)}</div></div>
+            <div><Label>Study days</Label><div className="mt-1 flex flex-wrap gap-1.5">{WEEKDAYS.map((d, i) => <Button size="sm" variant={p.days.includes(i) ? "default" : "outline"} aria-pressed={p.days.includes(i)} key={d} onClick={() => setP({ ...p, days: p.days.includes(i) ? p.days.filter((x) => x !== i) : [...p.days, i] })} className={cn("rounded-full border px-3 py-1 text-xs", p.days.includes(i) ? "bg-primary text-primary-foreground" : "bg-card")}>{d}</Button>)}</div></div>
             <div className="space-y-1"><Label>Time zone</Label><Input value={p.tz} onChange={(e) => setP({ ...p, tz: e.target.value })} /></div>
             <label className="flex items-center justify-between text-sm">Show me on the leaderboard (name + XP only)<Switch checked={p.opt} onCheckedChange={(v) => setP({ ...p, opt: v })} /></label>
             <div className="space-y-2 border-t pt-3">

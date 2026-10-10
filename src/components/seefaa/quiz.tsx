@@ -48,12 +48,12 @@ export function QuizRunner({ items, onDone }: { items: M[]; onDone: () => void }
       {choices.length ? (
         <div className="mt-4 space-y-2">
           {choices.map((c) => (
-            <button key={c.label} disabled={revealed} onClick={() => setAnswer(c.label)}
-              className={cn("flex w-full gap-3 rounded-lg border p-3 text-left text-sm",
+            <Button variant="outline" key={c.label} disabled={revealed} onClick={() => setAnswer(c.label)}
+              className={cn("h-auto w-full justify-start gap-3 whitespace-normal rounded-lg p-3 text-left text-sm",
                 answer === c.label && "border-primary bg-accent",
                 revealed && known && norm(c.label) === norm(m.correct_answer) && "border-success bg-success/15")}>
               <b>{c.label}.</b> {c.text}
-            </button>
+            </Button>
           ))}
         </div>
       ) : (
