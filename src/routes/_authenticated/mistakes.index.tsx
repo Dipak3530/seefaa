@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PageHeader, Empty, NativeSelect } from "@/components/seefaa/bits";
 import { QuizRunner } from "@/components/seefaa/quiz";
+import { QuestionText } from "@/components/seefaa/question";
 import { useCurriculum } from "@/hooks/use-seefaa";
 import { ERROR_CATEGORIES, categoryLabel, fmtDate } from "@/lib/cfa";
 import { cn } from "@/lib/utils";
@@ -68,16 +69,17 @@ function Bank() {
           action={<Button asChild><Link to="/error-log">Log a Mistake</Link></Button>} />
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
-          {list.map((m) => (
-            <Link key={m.id} to="/mistakes/$id" params={{ id: m.id }} className="card-soft block p-4 transition hover:-translate-y-0.5">
+          {list.map((m, index) => (
+            <Link key={m.id} to="/mistakes/$id" params={{ id: m.id }} className="card-soft flex min-w-0 flex-col p-5 transition hover:-translate-y-0.5 hover:border-primary">
               <div className="mb-2 flex flex-wrap items-center gap-1.5 text-[11px]">
                 <span className="rounded-md bg-secondary px-2 py-1">{cur.subject(m.subject_id)?.short_name}</span>
                 <span className="rounded-md bg-muted px-2 py-1">{categoryLabel(m.error_category)}</span>
                 <span className={cn("rounded-md px-2 py-1", m.mastery === "mastered" ? "bg-primary text-primary-foreground" : "bg-background")}>{m.mastery === "mastered" ? "Mastered" : m.mastery === "new" ? "New" : "Needs practice"}</span>
                 {m.source === "ai" && <span className="rounded-full bg-primary/15 px-2 py-0.5">AI-generated</span>}
               </div>
-              <p className="line-clamp-3 text-sm">{m.question}</p>
-              <p className="mt-2 text-xs text-muted-foreground">{fmtDate(m.created_at)} · {m.correct_count}/{m.attempts_count} correct · review {fmtDate(m.next_review)}</p>
+              <p className="mb-3 mt-2 font-display text-sm font-bold">{m.concept || `Question ${String(index + 1).padStart(2, "0")}`}</p>
+              <QuestionText text={m.question} compact />
+              <div className="mt-auto pt-5"><div className="flex flex-wrap items-center justify-between gap-2 border-t pt-3 text-xs"><span className="text-muted-foreground">{m.correct_count}/{m.attempts_count} correct · {fmtDate(m.created_at)}</span><span className="font-bold text-primary">Review {fmtDate(m.next_review)} →</span></div></div>
             </Link>
           ))}
         </div>

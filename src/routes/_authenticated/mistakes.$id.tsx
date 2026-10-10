@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Panel, Markdown, NativeSelect } from "@/components/seefaa/bits";
 import { QuizRunner } from "@/components/seefaa/quiz";
+import { AnswerChoice, QuestionText } from "@/components/seefaa/question";
 import { useCurriculum, useInvalidate } from "@/hooks/use-seefaa";
 import { ERROR_CATEGORIES, categoryLabel, fmtDate } from "@/lib/cfa";
 import type { TablesUpdate } from "@/integrations/supabase/types";
@@ -109,7 +110,7 @@ function MistakeDetail() {
         </div>
       )}
       <div className="grid gap-5 lg:grid-cols-5">
-        <div className="space-y-5 lg:col-span-2">
+        <div className="min-w-0 space-y-5 lg:col-span-3">
           <Panel title="Question" action={<Button size="sm" variant="ghost" onClick={() => setEditing(!editing)}>{editing ? "Cancel" : "Edit"}</Button>}>
             {editing ? (
               <div className="space-y-3">
@@ -133,13 +134,16 @@ function MistakeDetail() {
               </div>
             ) : (
               <>
-                <p className="whitespace-pre-wrap text-sm leading-relaxed">{m.question}</p>
-                {choices.length > 0 && <ul className="mt-3 space-y-1 text-sm">{choices.map((c) => <li key={c.label}><b>{c.label}.</b> {c.text}</li>)}</ul>}
-                <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
-                  <div className="rounded-lg bg-destructive/10 p-2"><p className="text-xs text-muted-foreground">Your answer</p>{m.selected_answer ?? "—"}</div>
-                  <div className="rounded-lg bg-success/15 p-2"><p className="text-xs text-muted-foreground">Correct answer</p>{m.correct_answer ? `${m.correct_answer}${m.correct_verified ? " ✓ verified" : " (unverified)"}` : "Not recorded"}</div>
+                <article className="rounded-lg border border-border bg-card p-4 sm:p-6">
+                  {m.concept && <p className="mb-4 text-xs font-bold uppercase text-primary">{m.concept}</p>}
+                  <QuestionText text={m.question} />
+                </article>
+                {choices.length > 0 && <div className="mt-5 space-y-3"><p className="text-[11px] font-bold uppercase text-muted-foreground">Answer choices</p>{choices.map((c) => <AnswerChoice key={c.label} label={c.label} text={c.text} state={m.correct_verified && c.label === m.correct_answer ? "correct" : c.label === m.selected_answer ? "selected" : "default"} />)}</div>}
+                <div className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
+                  <div className="border-l-4 border-primary bg-accent/40 p-4"><p className="mb-1 text-xs font-semibold text-muted-foreground">Your answer</p><p className="break-words font-bold">{m.selected_answer ?? "Not recorded"}</p></div>
+                  <div className="border-l-4 border-info bg-info/5 p-4"><p className="mb-1 text-xs font-semibold text-muted-foreground">Recorded correct answer</p><p className="break-words font-bold">{m.correct_answer ?? "Not recorded"}</p>{m.correct_answer && <p className="mt-1 text-xs text-muted-foreground">{m.correct_verified ? "✓ Verified" : "Unverified"}</p>}</div>
                 </div>
-                {m.notes && <p className="mt-3 rounded-lg bg-muted p-2 text-sm">{m.notes}</p>}
+                {m.notes && <div className="mt-5 border-t pt-4"><p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Your notes</p><QuestionText text={m.notes} /></div>}
               </>
             )}
           </Panel>
@@ -156,7 +160,7 @@ function MistakeDetail() {
             <Button size="sm" variant="ghost" className="mt-4 text-destructive" onClick={del}><Trash2 className="mr-1 h-4 w-4" /> Delete mistake</Button>
           </Panel>
         </div>
-        <div className="lg:col-span-3">
+        <div className="min-w-0 lg:col-span-2">
           <Panel title="AI tutor">
             {!data.explanations.length ? (
               <div className="py-8 text-center">
