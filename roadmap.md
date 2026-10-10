@@ -1,4 +1,5 @@
 # SEEFAA roadmap
+- [ ] Apply reference-inspired tactile comic buttons and shared theme; verify navigation and study surfaces
 - [x] Reject stale optimized React hashes to prevent separate hook dispatchers; verified public and signed-in pages without runtime errors
 - [x] Editorial redesign: global cream/coral design system and landing page
 - [x] Editorial redesign: horizontal navigation, dashboard, all study screens

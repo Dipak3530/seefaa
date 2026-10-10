@@ -45,9 +45,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     await qc.cancelQueries(); qc.clear(); await supabase.auth.signOut(); navigate({ to: "/auth", replace: true });
   }
   const side = <div className="flex h-full flex-col gap-6 overflow-y-auto p-5"><Logo /><NavList onNavigate={() => setOpen(false)} /><div className="mt-auto space-y-2 border-t pt-4"><div className="flex items-center gap-2 rounded-md bg-accent px-3 py-2 text-sm"><Trophy className="h-4 w-4 text-primary" /><span className="font-bold">{xp?.total ?? 0} XP</span> earned</div><Button variant="ghost" className="w-full justify-start" onClick={signOut}><LogOut /> Sign out</Button></div></div>;
-  return <div className="min-h-screen bg-background">
+  return <div className="comic-canvas min-h-screen bg-background">
     <header className="sticky top-0 z-30 border-b bg-background px-4 pt-3 sm:px-6 lg:px-8">
-      <div className="mx-auto grid max-w-[1440px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-lg border bg-card px-4 lg:flex lg:justify-between">
+      <div className="comic-nav mx-auto grid max-w-[1440px] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-lg bg-card px-4 lg:flex lg:justify-between">
         <div className="min-w-0 py-3"><Logo /></div>
         <nav aria-label="Primary navigation" className="app-navigation hidden min-w-0 items-center xl:flex">{PRIMARY_NAV.map(n => <Link key={n.to} to={n.to} className="relative whitespace-nowrap px-3 py-6 text-xs font-semibold text-muted-foreground hover:text-primary">{n.label}</Link>)}</nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">

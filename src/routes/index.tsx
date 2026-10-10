@@ -57,10 +57,10 @@ function StudyPreview() {
 }
 
 function Landing() {
-  return <div className="min-h-screen overflow-hidden bg-background">
+  return <div className="comic-canvas min-h-screen overflow-hidden bg-background">
     <header className="relative z-20 mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-6 sm:flex sm:justify-between lg:px-8">
       <Logo />
-      <nav aria-label="Main navigation" className="hidden items-center gap-2 rounded-lg bg-card px-5 lg:flex">
+      <nav aria-label="Main navigation" className="comic-nav hidden items-center gap-2 rounded-lg bg-card px-5 lg:flex">
         <Link to="/" className="border-b-2 border-primary px-3 py-4 text-sm font-semibold text-primary">Home</Link>
         <Link to="/curriculum" className="px-3 py-4 text-sm font-semibold hover:text-primary">Curriculum</Link>
         <Link to="/plan" className="px-3 py-4 text-sm font-semibold hover:text-primary">Study Planner</Link>
@@ -75,7 +75,7 @@ function Landing() {
           <p className="mb-5 flex items-center gap-2 text-sm font-bold"><span className="h-2 w-2 rounded-full bg-primary" />Your CFA Journey, Smarter.</p>
           <h1 className="text-4xl font-extrabold leading-[1.15] sm:text-5xl lg:text-[58px]">Master the CFA.<br /><span className="text-primary">One concept</span><br />at a time.</h1>
           <p className="mt-6 max-w-md text-base leading-7 text-muted-foreground">A big goal deserves a thoughtful plan. Personalized planning, structured curriculum tracking, smart revision, and mistake analysis — all in your corner.</p>
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row"><Button asChild size="lg" className="h-12 px-6"><Link to="/dashboard">Start Studying <ArrowRight /></Link></Button><Button asChild variant="ghost" size="lg" className="h-12 px-4"><Link to="/curriculum">Explore the Curriculum <BookOpen /></Link></Button></div>
+          <div className="mt-7 flex flex-col gap-4 sm:flex-row"><Button asChild size="lg" className="h-12 px-6"><Link to="/dashboard">Start Studying <ArrowRight /></Link></Button><Button asChild variant="secondary" size="lg" className="h-12 px-4"><Link to="/curriculum">Explore the Curriculum <BookOpen /></Link></Button></div>
           <p className="mt-6 flex items-center gap-2 text-xs text-muted-foreground"><CheckCircle2 className="h-4 w-4 text-primary" /> Built for CFA Level I. Designed for real life.</p>
         </div>
         <StudyPreview />
