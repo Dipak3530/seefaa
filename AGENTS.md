@@ -11,6 +11,7 @@
 
 ## Architecture rules
 - Shared visual tokens live in `src/styles.css`, reusable learning surfaces in `bits.tsx`, and authenticated navigation in `app-shell.tsx`; redesigns change presentation without replacing data hooks or database workflows.
+- Content routes use the browser-safe `pageMeta` helper for consistent page-specific social metadata without importing server modules.
 - XP is awarded only by database triggers into `xp_ledger` with a unique `source_key`; clients cannot insert XP (prevents duplicate/forged awards).
 - Timer pause/resume/finish goes through the `timer_action` SQL function so durations use server timestamps; one open timer per user enforced by a partial unique index.
 - Plan generation is a pure function in `src/lib/planner.ts` (tested); applying a plan only replaces future undone tasks.

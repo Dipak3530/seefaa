@@ -1,7 +1,7 @@
 # SEEFAA roadmap
-- [ ] Editorial redesign: global cream/coral design system and landing page
-- [ ] Editorial redesign: horizontal navigation, dashboard, all study screens
-- [ ] Editorial redesign: verify navigation, forms, authentication and timer persistence
+- [x] Editorial redesign: global cream/coral design system and landing page
+- [x] Editorial redesign: horizontal navigation, dashboard, all study screens
+- [x] Editorial redesign: verify signed-in navigation, editable forms, sign-out and timer pause/resume persistence
 - [x] Database, security, XP ledger, timer, storage
 - [x] Curriculum replaced with user-supplied 2027 module list (Quant "Appendices A–E" flagged supplementary)
 - [x] App shell, auth, onboarding, dashboard + timers
@@ -9,4 +9,4 @@
 - [x] Error log (screenshot + AI extraction), mistake bank, AI explanations
 - [x] Revision centre, practice, mocks, formulas, analytics, leaderboard, settings
 - [ ] LOS statements — waiting on verified LOS source from user
-- [ ] Signed-in end-to-end check — waiting on a real account sign-up
+- [x] Signed-in UI and timer end-to-end check using the owner's account; temporary session discarded without changing study progress
