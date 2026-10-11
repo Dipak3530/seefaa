@@ -53,21 +53,20 @@ export type PracticeQuestion = { n: number; stem: string; choices: { label: stri
  * Presentation only — never invents or alters content.
  */
 export function parsePracticeItems(blocks: ContentBlock[], noise: string[] = []): PracticeQuestion[] {
-  let text = blocks.map((b) => b.x).join(" ").replace(/­/g, "").replace(/\s+/g, " ").trim();
+  let text = blocks.map((b) => b.x).join(" ").replace(/­/g, "").trim();
   for (const n of noise) if (n) text = text.split(n).join(" ");
-  const parts = text.split(/(?<!\d)(\d{1,2})\.\t|(?<!\d)(\d{1,2})\.\s(?=[A-Z])/);
+  const parts = text.split(/(\d{1,2})\.\t/);
   const items: PracticeQuestion[] = [];
-  for (let i = 1; i < parts.length; i += 3) {
-    const n = Number(parts[i] ?? parts[i + 1]);
-    const body = (parts[i + 2] ?? "").trim();
+  for (let i = 1; i + 1 < parts.length; i += 2) {
+    const n = Number(parts[i]);
+    const body = parts[i + 1].replace(/\s+/g, " ").trim();
     if (!n || !body) continue;
-    const segs = body.split(/([A-F])\.\t|([A-F])\.\s(?=[A-Z0-9−-])/);
+    const segs = body.split(/([A-F])\.\t/);
     const stem = segs[0].trim();
     const choices: { label: string; text: string }[] = [];
-    for (let j = 1; j + 1 < segs.length; j += 3) {
-      const label = segs[j] ?? segs[j + 1];
-      const ct = (segs[j + 2] ?? "").trim();
-      if (label && ct) choices.push({ label, text: ct });
+    for (let j = 1; j + 1 < segs.length; j += 2) {
+      const ct = segs[j + 1].trim();
+      if (ct) choices.push({ label: segs[j], text: ct });
     }
     items.push({ n, stem, choices });
   }
