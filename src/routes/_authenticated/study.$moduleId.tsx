@@ -9,7 +9,7 @@ import { Bar, NativeSelect, Panel } from "@/components/seefaa/bits";
 import { Button } from "@/components/ui/button";
 import { useAttempt, useCurriculum, useInvalidate, useProfile, useProgress } from "@/hooks/use-seefaa";
 import { moduleNumber, parsePracticeItems, sectionsForLos, tagSections, useSubjectContent, type ContentSection, type PracticeQuestion } from "@/lib/study-content";
-import { QuestionCard } from "@/components/seefaa/question";
+import { QuestionCard, QuestionText } from "@/components/seefaa/question";
 import { REFERENCE_FORMULAS, referenceMatches } from "@/lib/formula-reference";
 import { cn } from "@/lib/utils";
 
