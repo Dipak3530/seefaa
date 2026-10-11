@@ -138,7 +138,7 @@ function MistakeDetail() {
               </div>
             ) : (
               <>
-                <QuestionCard eyebrow={m.concept ?? "Logged question"} stem={m.question} choices={choices} choiceState={(l) => m.correct_verified && l === m.correct_answer ? "correct" : l === m.selected_answer ? "selected" : "default"} />
+                <QuestionCard eyebrow="Logged question" stem={m.question} choices={choices} choiceState={(l) => m.correct_verified && l === m.correct_answer ? "correct" : l === m.selected_answer ? "selected" : "default"} />
 
                 <div className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
                   <div className="border-l-4 border-primary bg-accent/40 p-4"><p className="mb-2 text-xs font-semibold text-muted-foreground">Your answer</p><p className="break-words font-display text-lg font-bold">{m.selected_answer ?? "Not recorded"}</p>{choices.find((c) => c.label === m.selected_answer) && <p className="mt-2 text-sm leading-6">{choices.find((c) => c.label === m.selected_answer)?.text}</p>}</div>
