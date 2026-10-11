@@ -15,7 +15,7 @@ export function QuestionText({ text, compact = false }: { text: string; compact?
 
 export function AnswerChoice({ label, text, state = "default", onSelect, disabled }: {
   label: string; text: string; state?: "default" | "selected" | "correct" | "incorrect";
-  onSelect?: () => void; disabled?: boolean;
+  onSelect?: (() => void) | undefined; disabled?: boolean | undefined;
 }) {
   const content = <>
     <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-md border font-display text-sm font-bold", state === "correct" ? "border-info bg-info text-info-foreground" : state === "selected" || state === "incorrect" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-foreground")}>{label.replace(/[.)]$/, "")}</span>
