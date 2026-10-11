@@ -46,7 +46,7 @@ export function QuestionCard({ number, eyebrow, stem, choices, choiceState, onSe
     </article>
     {choices.length > 0 && <div className="space-y-3">
       <p className="text-[11px] font-bold uppercase text-muted-foreground">Answer choices</p>
-      {choices.map((c) => <AnswerChoice key={c.label} label={c.label} text={c.text} state={choiceState?.(c.label) ?? "default"} />)}
+      {choices.map((c) => <AnswerChoice key={c.label} label={c.label} text={c.text} state={choiceState?.(c.label) ?? "default"} onSelect={onSelect ? () => onSelect(c.label) : undefined} disabled={disabled} />)}
     </div>}
   </div>;
 }
