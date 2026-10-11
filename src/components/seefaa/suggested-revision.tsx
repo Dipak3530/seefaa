@@ -58,7 +58,13 @@ export function SuggestedRevision({ onPick }: { onPick?: (subjectId: string, mod
             <li key={c.id}>
               <button
                 type="button"
-                onClick={() => { setPicked(c.id); if (m) onPick?.(m.subject_id, m.id); }}
+                onClick={() => {
+                  setPicked(c.id);
+                  if (m) {
+                    onPick?.(m.subject_id, m.id);
+                    navigate({ to: "/study/$moduleId", params: { moduleId: m.id } });
+                  }
+                }}
                 className={`flex w-full items-center gap-3 rounded-md border px-3 py-2 text-left transition ${active ? "border-primary bg-accent" : "border-border bg-background hover:border-foreground/40"}`}
               >
                 <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border-2 border-foreground text-xs font-bold ${active ? "bg-primary text-primary-foreground" : "bg-card"}`}>R{c.stage}</span>
@@ -67,6 +73,7 @@ export function SuggestedRevision({ onPick }: { onPick?: (subjectId: string, mod
                   <span className="block text-xs text-muted-foreground">{s?.short_name ?? s?.name} · {overdue ? "overdue · " : ""}due {c.due_date}</span>
                 </span>
                 {i === 0 && <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase text-primary-foreground">Top pick</span>}
+                <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
               </button>
             </li>
           );
