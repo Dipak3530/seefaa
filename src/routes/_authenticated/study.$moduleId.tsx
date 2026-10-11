@@ -167,20 +167,10 @@ function Lesson({ s, moduleTitle, open, onToggle }: { s: ContentSection; moduleT
         <span className="flex gap-1">{s.los.map((n) => <span key={n} className="rounded bg-accent px-1.5 py-0.5 text-[10px] font-bold text-primary">LOS {n}</span>)}</span>
       </button>
       {open && (items.length > 0 ? (
-        <ol className="space-y-4 border-t px-4 py-4 md:px-6">
+        <ol className="space-y-6 border-t px-4 py-4 md:px-6">
           {items.map((q) => (
-            <li key={q.n} className="rounded-lg border bg-background p-4">
-              <div className="flex items-start gap-3">
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-primary bg-accent font-display text-sm font-extrabold text-primary">{q.n}</span>
-                <div className="min-w-0 flex-1">
-                  <QuestionText text={q.stem} />
-                  {q.choices.length > 0 && (
-                    <div className="mt-3 space-y-2">
-                      {q.choices.map((c) => <AnswerChoice key={c.label} label={c.label} text={c.text} />)}
-                    </div>
-                  )}
-                </div>
-              </div>
+            <li key={q.n}>
+              <QuestionCard number={q.n} eyebrow={isSolutions ? "Worked solution" : "Practice question"} stem={q.stem} choices={q.choices} />
             </li>
           ))}
         </ol>
