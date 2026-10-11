@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { PageHeader, Panel } from "@/components/seefaa/bits";
 import { useAttempt, useCurriculum, useInvalidate, useProfile } from "@/hooks/use-seefaa";
 import { WEEKDAYS, fmtDate, ETHICS_ID } from "@/lib/cfa";
+import { saveAiKey } from "@/lib/ai.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -35,6 +36,10 @@ function Settings() {
   const [carry, setCarry] = useState({ mistakes: true, formulas: true });
   const [examNew, setExamNew] = useState("");
   const { data: attempts, refetch } = useQuery({ queryKey: ["attempts"], queryFn: async () => (await supabase.from("exam_attempts").select("*").order("created_at")).data ?? [] });
+  const { data: aiKeyRow, refetch: refetchKey } = useQuery({ queryKey: ["ai-key"], queryFn: async () => (await supabase.from("user_ai_keys").select("provider, api_key").maybeSingle()).data });
+  const [aiProvider, setAiProvider] = useState<"openai" | "anthropic" | "gemini">("openai");
+  const [aiKey, setAiKey] = useState("");
+  const [keyBusy, setKeyBusy] = useState(false);
 
   useEffect(() => {
     if (profile) setP({ display_name: profile.display_name ?? "", hours: Number(profile.hours_per_day), days: profile.study_days, opt: profile.leaderboard_opt_in, tz: profile.timezone, rem: profile.reminders as Reminders });
