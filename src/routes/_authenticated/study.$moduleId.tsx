@@ -8,8 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Bar, NativeSelect, Panel } from "@/components/seefaa/bits";
 import { Button } from "@/components/ui/button";
 import { useAttempt, useCurriculum, useInvalidate, useProfile, useProgress } from "@/hooks/use-seefaa";
-import { moduleNumber, parsePracticeItems, sectionsForLos, tagSections, useSubjectContent, type ContentSection, type PracticeQuestion } from "@/lib/study-content";
-import { QuestionCard } from "@/components/seefaa/question";
+import { moduleNumber, parsePracticeItems, sectionsForLos, solutionLetter, tagSections, useSubjectContent, type ContentSection, type PracticeQuestion } from "@/lib/study-content";
+import { QuestionCard, QuestionText } from "@/components/seefaa/question";
 import { REFERENCE_FORMULAS, referenceMatches } from "@/lib/formula-reference";
 import { cn } from "@/lib/utils";
 
@@ -168,6 +168,12 @@ function Lesson({ s, moduleTitle, subjectId, moduleId, open, onToggle }: { s: Co
       </button>
       {open && (items.length > 0 ? (
         <ol className="space-y-6 border-t px-4 py-4 md:px-6">
+          {items[0]?.vignette && (
+            <li className="rounded-lg border bg-accent/40 p-4">
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Scenario · questions {items[0].n}–{items[items.length - 1].n}</p>
+              <QuestionText text={items[0].vignette} />
+            </li>
+          )}
           {items.map((q) => (
             <li key={q.n}>
               {isSolutions || q.choices.length === 0
@@ -192,27 +198,27 @@ function PortalQuestion({ q, subjectId, moduleId }: { q: PracticeQuestion; subje
   const inv = useInvalidate();
   const [picked, setPicked] = useState<string | null>(null);
   const [result, setResult] = useState<"right" | "logged" | null>(null);
+  const [showSolution, setShowSolution] = useState(false);
   const [busy, setBusy] = useState(false);
+  const answer = solutionLetter(q);
 
-  async function markWrong() {
-    if (!picked) return;
+  async function logMistake(choice: string) {
     setBusy(true);
     try {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Please sign in again");
       const { data: existing } = await supabase.from("mistakes").select("id").eq("module_id", moduleId).eq("question", q.stem).limit(1);
       if (existing?.length) {
-        await supabase.from("mistakes").update({ selected_answer: picked, updated_at: new Date().toISOString() }).eq("id", existing[0].id);
+        await supabase.from("mistakes").update({ selected_answer: choice, correct_answer: answer, correct_verified: !!answer, updated_at: new Date().toISOString() }).eq("id", existing[0].id);
       } else {
         const { error } = await supabase.from("mistakes").insert({
           user_id: u.user.id, attempt_id: attempt?.id ?? null, version_id: attempt?.version_id ?? "2027-L1",
           subject_id: subjectId, module_id: moduleId, question: q.stem, choices: q.choices,
-          selected_answer: picked, correct_answer: null, correct_verified: false,
+          selected_answer: choice, correct_answer: answer, correct_verified: !!answer,
           concept: `Practice problem ${q.n}`, notes: "Logged from the Study Portal practice problems.", error_category: "conceptual",
         });
         if (error) throw error;
       }
-      setResult("logged");
       inv();
       toast.success("Added to your mistake log for this module");
     } catch (e) {
@@ -220,12 +226,30 @@ function PortalQuestion({ q, subjectId, moduleId }: { q: PracticeQuestion; subje
     } finally { setBusy(false); }
   }
 
+  async function choose(label: string) {
+    if (result || busy) return;
+    setPicked(label);
+    if (!answer) return; // no verified key — ask the student to self-check
+    if (label === answer) { setResult("right"); setShowSolution(true); }
+    else { setResult("logged"); setShowSolution(true); await logMistake(label); }
+  }
+
+  async function markWrong() {
+    if (!picked) return;
+    await logMistake(picked);
+    setResult("logged");
+  }
+
   return (
     <div className="space-y-3">
       <QuestionCard number={q.n} eyebrow="Practice question" stem={q.stem} choices={q.choices}
-        choiceState={(l) => l === picked ? (result === "right" ? "correct" : result === "logged" ? "incorrect" : "selected") : "default"}
-        onSelect={result ? undefined : setPicked} />
-      {picked && !result && (
+        choiceState={(l) => {
+          if (l === picked) return result === "right" ? "correct" : result === "logged" ? "incorrect" : "selected";
+          if (result && answer && l === answer) return "correct";
+          return "default";
+        }}
+        onSelect={result ? undefined : choose} disabled={busy} />
+      {picked && !result && !answer && (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-card p-3">
           <span className="mr-auto text-sm">You chose <b>{picked}</b>. Check it against the curriculum solution:</span>
           <Button size="sm" variant="outline" onClick={() => setResult("right")}>I got it right</Button>
@@ -234,9 +258,15 @@ function PortalQuestion({ q, subjectId, moduleId }: { q: PracticeQuestion; subje
       )}
       {result && (
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <span className="mr-auto font-semibold">{result === "right" ? "Nice — marked correct." : "Saved to your mistake log."}</span>
+          <span className="mr-auto font-semibold">{result === "right" ? "Correct — nice work." : "Saved to your mistake log."}</span>
           {result === "logged" && <Link to="/mistakes" className="font-bold text-primary underline">Open mistake log</Link>}
-          <Button size="sm" variant="ghost" onClick={() => { setPicked(null); setResult(null); }}>Try again</Button>
+          <Button size="sm" variant="ghost" onClick={() => { setPicked(null); setResult(null); setShowSolution(false); }}>Try again</Button>
+        </div>
+      )}
+      {q.solution && (
+        <div>
+          <Button size="sm" variant="outline" onClick={() => setShowSolution((v) => !v)}>{showSolution ? "Hide solution" : "Show solution"}</Button>
+          {showSolution && <div className="mt-2 rounded-lg border bg-accent/40 p-4"><p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Curriculum solution</p><QuestionText text={q.solution} /></div>}
         </div>
       )}
     </div>

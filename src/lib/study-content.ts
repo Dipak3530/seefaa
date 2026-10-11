@@ -44,31 +44,123 @@ export function sectionsForLos(sections: ContentSection[], los: number | null) {
   return sections.filter((s) => s.los.includes(los));
 }
 
-export type PracticeQuestion = { n: number; stem: string; choices: { label: string; text: string }[] };
+export type PracticeQuestion = { n: number; stem: string; choices: { label: string; text: string }[]; vignette?: string; solution?: string };
 
 /**
  * Split a run-on "Practice Problems" / "Solutions" extraction into numbered items.
- * The PDF text arrives as one paragraph: "1.\t stem A.\t x. B.\t y. C.\t z. 2.\t …",
- * with page headers (module title, "Practice Problems") embedded mid-sentence.
+ * Two source layouts exist: tab-delimited ("1.\t stem A.\t x. …", Quant) and plain
+ * prose ("1. stem A. x. B. y. C. z. 2. …", all other subjects), the latter often
+ * opening with a vignette ("The following information relates to questions 1-5 …").
+ * Numbering must run sequentially and choices must ascend from A, so stray numbers
+ * and abbreviations inside the text are not mistaken for question or choice starts.
  * Presentation only — never invents or alters content.
  */
 export function parsePracticeItems(blocks: ContentBlock[], noise: string[] = []): PracticeQuestion[] {
   let text = blocks.map((b) => b.x).join(" ").replace(/­/g, "").trim();
   for (const n of noise) if (n) text = text.split(n).join(" ");
-  const parts = text.split(/(\d{1,2})\.\t/);
+  const tabbed = splitNumbered(text, /(\d{1,2})\.\t/, /([A-F])\.\t/);
+  if (tabbed.length >= 2) return mergeSolutions(tabbed);
+  return mergeSolutions(splitProse(text));
+}
+
+const SOLUTION_PHRASING = /^([A-F])\s+is correct|^The correct (?:response|answer) is/i;
+
+/**
+ * Many practice sections append their answer key as a second numbered run
+ * (restarting at 1) or as paragraphs phrased "B is correct. …". Those are not
+ * questions: fold them onto the question with the same number as its solution.
+ */
+function mergeSolutions(items: PracticeQuestion[]): PracticeQuestion[] {
+  const out: PracticeQuestion[] = [];
+  const byN = new Map<number, PracticeQuestion>();
+  let solutionRun = false;
+  for (const q of items) {
+    if (!solutionRun && out.length && q.n <= out[out.length - 1].n) solutionRun = true;
+    if (solutionRun || SOLUTION_PHRASING.test(q.stem)) {
+      const target = byN.get(q.n);
+      if (target) {
+        const text = [q.stem, ...q.choices.map((c) => `${c.label}. ${c.text}`)].join(" ");
+        target.solution = [target.solution, text].filter(Boolean).join(" ");
+      }
+      continue;
+    }
+    byN.set(q.n, q);
+    out.push(q);
+  }
+  return out;
+}
+
+/** The verified correct letter when the source solution states one. */
+export function solutionLetter(q: PracticeQuestion): string | null {
+  const m = q.solution?.match(/^([A-F])\s+is correct|^The correct (?:response|answer) is\s+([A-F])/i);
+  return m ? (m[1] ?? m[2]).toUpperCase() : null;
+}
+
+function splitNumbered(text: string, numRe: RegExp, choiceRe: RegExp): PracticeQuestion[] {
+  const parts = text.split(numRe);
   const items: PracticeQuestion[] = [];
   for (let i = 1; i + 1 < parts.length; i += 2) {
     const n = Number(parts[i]);
     const body = parts[i + 1].trim();
     if (!n || !body) continue;
-    const segs = body.split(/([A-F])\.\t/);
-    const stem = segs[0].replace(/\s+/g, " ").trim();
-    const choices: { label: string; text: string }[] = [];
-    for (let j = 1; j + 1 < segs.length; j += 2) {
-      const ct = segs[j + 1].replace(/\s+/g, " ").trim();
-      if (ct) choices.push({ label: segs[j], text: ct });
-    }
-    items.push({ n, stem, choices });
+    items.push({ n, ...splitChoices(body, choiceRe) });
   }
   return items;
+}
+
+function splitChoices(body: string, choiceRe: RegExp): { stem: string; choices: { label: string; text: string }[] } {
+  const segs = body.split(choiceRe);
+  const stem = segs[0].replace(/\s+/g, " ").trim();
+  const choices: { label: string; text: string }[] = [];
+  for (let j = 1; j + 1 < segs.length; j += 2) {
+    const ct = segs[j + 1].replace(/\s+/g, " ").trim();
+    if (ct) choices.push({ label: segs[j], text: ct });
+  }
+  return { stem, choices };
+}
+
+/** Prose layout: find "N. " markers only when N continues the sequence 1, 2, 3 … */
+function splitProse(text: string): PracticeQuestion[] {
+  const re = /(?:^|\s)(\d{1,2})\.\s+/g;
+  const starts: { n: number; from: number; to: number }[] = [];
+  let expected = 1;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    const n = Number(m[1]);
+    if (n !== expected) {
+      // A run restarting at 1 after questions have started is the answer key.
+      if (n === 1 && starts.length) expected = 1;
+      else continue;
+    }
+    starts.push({ n, from: m.index + m[0].indexOf(m[1]), to: m.index + m[0].length });
+    expected++;
+  }
+  if (!starts.length) return [];
+  const vignette = text.slice(0, starts[0].from).replace(/\s+/g, " ").trim();
+  return starts.map((s, i) => {
+    const body = text.slice(s.to, i + 1 < starts.length ? starts[i + 1].from : undefined);
+    const item: PracticeQuestion = { n: s.n, ...splitChoicesProse(body) };
+    if (i === 0 && vignette) item.vignette = vignette;
+    return item;
+  });
+}
+
+/** Choices ascend A, B, C …; a letter only counts when it continues that sequence. */
+function splitChoicesProse(body: string): { stem: string; choices: { label: string; text: string }[] } {
+  const re = /(?:^|\s)([A-F])\.\s+/g;
+  const starts: { label: string; from: number; to: number }[] = [];
+  let expected = 65; // "A"
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(body))) {
+    if (m[1].charCodeAt(0) !== expected) continue;
+    starts.push({ label: m[1], from: m.index + m[0].indexOf(m[1]), to: m.index + m[0].length });
+    expected++;
+  }
+  if (!starts.length) return { stem: body.replace(/\s+/g, " ").trim(), choices: [] };
+  const stem = body.slice(0, starts[0].from).replace(/\s+/g, " ").trim();
+  const choices = starts.map((s, i) => ({
+    label: s.label,
+    text: body.slice(s.to, i + 1 < starts.length ? starts[i + 1].from : undefined).replace(/\s+/g, " ").trim(),
+  })).filter((c) => c.text);
+  return { stem, choices };
 }
