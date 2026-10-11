@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Panel, Markdown, NativeSelect } from "@/components/seefaa/bits";
 import { QuizRunner } from "@/components/seefaa/quiz";
-import { AnswerChoice, QuestionText } from "@/components/seefaa/question";
+import { AnswerChoice, QuestionCard, QuestionText } from "@/components/seefaa/question";
 import { useCurriculum, useInvalidate } from "@/hooks/use-seefaa";
 import { ERROR_CATEGORIES, categoryLabel, fmtDate } from "@/lib/cfa";
 import type { TablesUpdate } from "@/integrations/supabase/types";
