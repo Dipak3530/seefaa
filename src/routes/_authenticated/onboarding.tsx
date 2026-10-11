@@ -10,6 +10,7 @@ import { Logo } from "@/components/seefaa/app-shell";
 import { useCurriculum, useInvalidate } from "@/hooks/use-seefaa";
 import { WEEKDAYS, ETHICS_ID } from "@/lib/cfa";
 import { applyPlan, proposePlan } from "@/lib/plan-actions";
+import { saveAiKey } from "@/lib/ai.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
 });
 
 type Status = "not_started" | "partial" | "completed";
-const STEPS = ["Welcome", "Exam date", "Your starting point", "Confidence", "Study time", "Schedule", "First subject", "Your plan"];
+const STEPS = ["Welcome", "Exam date", "Your starting point", "Confidence", "Study time", "Schedule", "First subject", "AI key", "Your plan"];
 
 function Onboarding() {
   const { data: cur } = useCurriculum();
@@ -32,6 +33,10 @@ function Onboarding() {
   const [days, setDays] = useState<number[]>([1, 2, 3, 4, 5, 6]);
   const [target, setTarget] = useState("");
   const [first, setFirst] = useState("");
+  const [aiProvider, setAiProvider] = useState<"openai" | "anthropic" | "gemini">("openai");
+  const [aiKey, setAiKey] = useState("");
+  const [keySaved, setKeySaved] = useState(false);
+  const [keyBusy, setKeyBusy] = useState(false);
   const [busy, setBusy] = useState(false);
   if (!cur) return null;
   const subjects = cur.subjects;
@@ -70,7 +75,19 @@ function Onboarding() {
     }
   }
 
-  const canNext = step !== 6 || !!first;
+  async function connectKey() {
+    setKeyBusy(true);
+    try {
+      const r = await saveAiKey({ data: { provider: aiProvider, apiKey: aiKey.trim() } });
+      if (!r.ok) return toast.error(r.error);
+      setKeySaved(true);
+      toast.success("AI key verified and saved securely.");
+    } finally {
+      setKeyBusy(false);
+    }
+  }
+
+  const canNext = (step !== 6 || !!first) && (step !== 7 || keySaved);
   return (
     <div className="sky-bg min-h-screen px-4 py-10">
       <div className="mx-auto max-w-2xl">
@@ -147,6 +164,34 @@ function Onboarding() {
             </div>
           )}
           {step === 7 && (
+            <div className="mt-3 space-y-4">
+              <h2 className="text-2xl font-semibold">Connect your AI key</h2>
+              <p className="text-sm text-muted-foreground">
+                SEEFAA uses your own AI key for screenshot extraction and explanations — your usage, your bill, your privacy. The key is stored encrypted and never shown again.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {([["openai", "OpenAI"], ["anthropic", "Anthropic"], ["gemini", "Google Gemini"]] as const).map(([v, l]) => (
+                  <Button key={v} type="button" size="sm" variant={aiProvider === v ? "default" : "outline"} aria-pressed={aiProvider === v}
+                    onClick={() => { setAiProvider(v); setKeySaved(false); }}
+                    className={cn("rounded-full border px-4 py-1.5 text-sm", aiProvider === v ? "bg-primary text-primary-foreground border-primary" : "bg-card")}>{l}</Button>
+                ))}
+              </div>
+              <div className="space-y-1.5">
+                <Label>{aiProvider === "openai" ? "OpenAI API key" : aiProvider === "anthropic" ? "Anthropic API key" : "Gemini API key"}</Label>
+                <Input type="password" value={aiKey} onChange={(e) => { setAiKey(e.target.value); setKeySaved(false); }}
+                  placeholder={aiProvider === "openai" ? "sk-..." : aiProvider === "anthropic" ? "sk-ant-..." : "AIza..."} />
+                <p className="text-xs text-muted-foreground">
+                  {aiProvider === "openai" && "Get one at platform.openai.com → API keys."}
+                  {aiProvider === "anthropic" && "Get one at console.anthropic.com → API keys."}
+                  {aiProvider === "gemini" && "Get one free at aistudio.google.com → Get API key."}
+                </p>
+              </div>
+              <Button type="button" variant={keySaved ? "secondary" : "default"} loading={keyBusy} disabled={aiKey.trim().length < 10 || keySaved} onClick={connectKey}>
+                {keySaved ? "✓ Key connected" : keyBusy ? "Verifying…" : "Verify & connect"}
+              </Button>
+            </div>
+          )}
+          {step === 8 && (
             <div className="mt-3 space-y-3">
               <h2 className="text-2xl font-semibold">Ready to build your plan</h2>
               <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
