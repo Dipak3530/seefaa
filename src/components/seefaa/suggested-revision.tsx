@@ -15,6 +15,7 @@ export function SuggestedRevision({ onPick }: { onPick?: (subjectId: string, mod
   const [picked, setPicked] = useState<string | null>(null);
   const [perf, setPerf] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
 
   const { data: list = [] } = useQuery({
     queryKey: ["revision-suggest", attempt?.id],
