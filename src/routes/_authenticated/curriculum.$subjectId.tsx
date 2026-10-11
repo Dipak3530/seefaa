@@ -85,7 +85,7 @@ function SubjectPage() {
               <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 sm:grid-cols-[auto_minmax(0,1fr)_auto_auto]">
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-secondary text-xs font-bold text-primary">{i + 1}</span>
                 <div className="min-w-0">
-                  <p className="font-medium">{m.title}{m.needs_verification && <span className="ml-2 rounded bg-sun/40 px-1.5 py-0.5 text-[10px]">needs verification</span>}</p>
+                  <p className="font-medium"><Link to="/study/$moduleId" params={{ moduleId: m.id }} className="hover:text-primary hover:underline">{m.title}</Link>{m.needs_verification && <span className="ml-2 rounded bg-sun/40 px-1.5 py-0.5 text-[10px]">needs verification</span>}</p>
                   <p className="text-xs text-muted-foreground">
                     {p?.studied_on ? `Studied ${fmtDate(p.studied_on)} · ` : ""}{mistakes} linked mistake{mistakes === 1 ? "" : "s"}{acc != null ? ` · practice ${acc}% (${tot} Qs)` : ""}
                   </p>

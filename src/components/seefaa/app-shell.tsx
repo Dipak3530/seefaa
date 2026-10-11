@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { LayoutDashboard, CalendarDays, BookOpen, Camera, Library, RefreshCw, Target, ClipboardCheck, Sigma, BarChart3, Trophy, Settings, LogOut, Menu, Bell, ChevronDown, ArrowUpRight } from "lucide-react";
+import { LayoutDashboard, CalendarDays, BookOpen, Camera, Library, RefreshCw, Target, ClipboardCheck, Sigma, BarChart3, Trophy, Settings, LogOut, Menu, Bell, ChevronDown, ArrowUpRight, GraduationCap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -14,6 +14,7 @@ export const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/plan", label: "Study Planner", icon: CalendarDays },
   { to: "/curriculum", label: "Curriculum", icon: BookOpen },
+  { to: "/study", label: "Study Portal", icon: GraduationCap },
   { to: "/error-log", label: "Log a Mistake", icon: Camera },
   { to: "/mistakes", label: "Mistake Bank", icon: Library },
   { to: "/revision", label: "Revision Centre", icon: RefreshCw },
@@ -24,8 +25,8 @@ export const NAV = [
   { to: "/leaderboard", label: "Achievements", icon: Trophy },
   { to: "/settings", label: "Profile & Settings", icon: Settings },
 ] as const;
-const PRIMARY_NAV = [NAV[0], NAV[2], NAV[1], NAV[4], NAV[6], NAV[9]];
-const SECONDARY_NAV = [NAV[3], NAV[5], NAV[7], NAV[8], NAV[10]];
+const PRIMARY_NAV = [NAV[0], NAV[2], NAV[3], NAV[1], NAV[5], NAV[7], NAV[10]];
+const SECONDARY_NAV = [NAV[4], NAV[6], NAV[8], NAV[9], NAV[11]];
 
 export function Logo() {
   return <Link to="/" aria-label="SEEFAA home" className="flex shrink-0 items-center gap-2"><span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border-2 border-foreground bg-primary text-primary-foreground sm:h-9 sm:w-9"><BookOpen className="h-5 w-5" strokeWidth={2.5} /></span><span className="font-display text-xl font-extrabold text-foreground sm:text-2xl">SEEFAA<span className="text-primary">.</span></span></Link>;
@@ -63,7 +64,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
     </header>
     <main className="px-4 pb-32 pt-7 sm:px-6 lg:px-8 lg:pt-9"><div className="mx-auto max-w-[1360px]">{children}</div></main>
-    <nav aria-label="Quick navigation" className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t bg-card xl:hidden">{[NAV[0], NAV[2], NAV[1], NAV[4]].map(n => <Link key={n.to} to={n.to} className="flex flex-col items-center gap-1 py-3 text-[10px] font-semibold text-muted-foreground" activeProps={{ className: "text-primary bg-accent/30" }}><n.icon className="h-4 w-4" />{n.label}</Link>)}</nav>
+    <nav aria-label="Quick navigation" className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t bg-card xl:hidden">{[NAV[0], NAV[3], NAV[1], NAV[5]].map(n => <Link key={n.to} to={n.to} className="flex flex-col items-center gap-1 py-3 text-[10px] font-semibold text-muted-foreground" activeProps={{ className: "text-primary bg-accent/30" }}><n.icon className="h-4 w-4" />{n.label}</Link>)}</nav>
     <TimerPanel />
   </div>;
 }
