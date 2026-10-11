@@ -69,7 +69,7 @@ function Revision() {
       <li className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
         <span className={cn("grid h-9 w-9 place-items-center rounded-lg text-xs font-bold", c.due_date < today ? "bg-destructive/15 text-destructive" : "bg-secondary")}>R{c.stage}</span>
         <div className="flex-1">
-          <p className="text-sm font-medium">{mod?.title}</p>
+          {mod ? <Link to="/study/$moduleId" params={{ moduleId: mod.id }} className="text-sm font-medium hover:text-primary hover:underline">{mod.title} →</Link> : <p className="text-sm font-medium">Module</p>}
           <p className="text-xs text-muted-foreground">{cur.subject(mod?.subject_id)?.short_name} · due {fmtDate(c.due_date)}</p>
         </div>
         <Button size="sm" variant="ghost" onClick={() => reschedule(c.id, 1)}>Tomorrow</Button>

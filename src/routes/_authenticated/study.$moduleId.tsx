@@ -88,12 +88,18 @@ function ModulePractice({ moduleId }: { moduleId: string }) {
           </li>)}
         </ul>}
       </Panel>
-      <Panel title="Practice questions" action={<Button onClick={() => setPracticing(v => !v)} disabled={isLoading || !questionCount}><Play className="mr-2 h-4 w-4" />{practicing ? "Close practice" : "Practice"}</Button>}>
-        {isLoading ? <p className="text-sm text-muted-foreground">Loading questions…</p> : error ? <p className="text-sm text-destructive">Couldn’t load practice questions. Please refresh.</p> : <p className="text-sm text-muted-foreground">{questionCount ? `${questionCount} questions` : "No practice questions available for this module."}</p>}
-        {practicing && <div className="mt-5 space-y-8">{sets.map((set, i) => <div key={i}>
+      <Panel title="Practice questions" action={<Button onClick={() => setPracticing(v => !v)} disabled={isLoading || !(questionCount + mine.length)}><Play className="mr-2 h-4 w-4" />{practicing ? "Close practice" : "Practice"}</Button>}>
+        {isLoading ? <p className="text-sm text-muted-foreground">Loading questions…</p> : error ? <p className="text-sm text-destructive">Couldn’t load practice questions. Please refresh.</p> : <p className="text-sm text-muted-foreground">{questionCount + mine.length ? `${questionCount} website questions · ${mine.length} your logged questions` : "No practice questions available for this module."}</p>}
+        {practicing && <div className="mt-5 space-y-8">
+          {mine.length > 0 && <div>
+            <p className="mb-3 inline-block rounded-full border-2 border-foreground bg-secondary px-3 py-1 text-xs font-bold uppercase">Your logged questions · {mine.length}</p>
+            <ol className="space-y-6">{mine.map((m, i) => <li key={m.id}><LoggedQuestion m={m} n={i + 1} /></li>)}</ol>
+          </div>}
+          {questionCount > 0 && <p className="inline-block rounded-full border-2 border-foreground bg-primary px-3 py-1 text-xs font-bold uppercase text-primary-foreground">Website questions · {questionCount}</p>}
+          {sets.map((set, i) => <div key={i}>
           <ol className="space-y-6">
             {set.items[0]?.vignette && <li className="rounded-lg border bg-accent/40 p-4"><p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Scenario</p><QuestionText text={set.items[0].vignette} /></li>}
-            {set.items.map(q => <li key={q.n}>{q.choices.length ? <PortalQuestion q={q} subjectId={mod.subject_id} moduleId={moduleId} /> : <QuestionCard number={q.n} eyebrow="Practice question" stem={q.stem} choices={q.choices} />}</li>)}
+            {set.items.map(q => <li key={q.n}>{q.choices.length ? <PortalQuestion q={q} subjectId={mod.subject_id} moduleId={moduleId} /> : <QuestionCard number={q.n} eyebrow="Website question" stem={q.stem} choices={q.choices} />}</li>)}
           </ol>
         </div>)}</div>}
       </Panel>
