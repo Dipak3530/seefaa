@@ -72,7 +72,7 @@ function StudyModule() {
 
   return (
     <div>
-      <Link to="/study" className="mb-3 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"><ChevronLeft className="h-4 w-4" /> Study Portal</Link>
+      <Link to="/curriculum/$subjectId" params={{ subjectId: mod.subject_id }} className="mb-3 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"><ChevronLeft className="h-4 w-4" /> {subject.name}</Link>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           <p className="text-xs font-bold uppercase tracking-wider text-primary">{subject.name} · Module {idx + 1}</p>
