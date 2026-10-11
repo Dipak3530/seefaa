@@ -37,4 +37,25 @@ describe("practice problem parsing", () => {
   it("returns no items for ordinary prose", () => {
     expect(parsePracticeItems([{ t: "p" as const, x: "Just a paragraph about returns." }])).toEqual([]);
   });
+
+  const prose = [{ t: "p" as const, x: "1. The short-term shutdown point of production for a firm operating under perfect competition will most likely occur when: A. price is equal to average total cost. B. marginal revenue is equal to marginal cost. C. marginal revenue is equal to average variable costs. 2. Under conditions of perfect competition, a firm produces 50 units. The profit-maximizing output occurs where: A. total revenue is maximized. B. marginal revenue equals marginal cost. C. average cost is minimized." }];
+  it("parses the plain-prose layout used outside Quantitative Methods", () => {
+    const items = parsePracticeItems(prose);
+    expect(items.map((q) => q.n)).toEqual([1, 2]);
+    expect(items[0].choices.map((c) => c.label)).toEqual(["A", "B", "C"]);
+    expect(items[0].choices[2].text).toContain("average variable costs");
+    expect(items[1].stem).toContain("50 units");
+  });
+  it("keeps a vignette with its item set instead of swallowing it", () => {
+    const items = parsePracticeItems([{ t: "p" as const, x: "The following information relates to questions 1-2 Dee’s Arbor Group Inc. is a large investor in timber assets. 1. Which statement is correct? A. One B. Two C. Three 2. What is DAG LP? A. A fund B. A partnership C. A bond" }]);
+    expect(items).toHaveLength(2);
+    expect(items[0].vignette).toContain("Dee’s Arbor Group");
+    expect(items[0].stem).not.toContain("Dee’s Arbor Group");
+    expect(items[1].choices).toHaveLength(3);
+  });
+  it("does not treat numbers inside sentences as new questions", () => {
+    const items = parsePracticeItems([{ t: "p" as const, x: "1. A bond pays 8.5% over 30. years, semiannually. The yield is: A. 4.25% B. 8.5% C. 17.0%" }]);
+    expect(items).toHaveLength(1);
+    expect(items[0].stem).toContain("30. years");
+  });
 });
