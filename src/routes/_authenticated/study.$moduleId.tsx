@@ -8,7 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Bar, NativeSelect, Panel } from "@/components/seefaa/bits";
 import { Button } from "@/components/ui/button";
 import { useAttempt, useCurriculum, useInvalidate, useProfile, useProgress } from "@/hooks/use-seefaa";
-import { moduleNumber, sectionsForLos, tagSections, useSubjectContent, type ContentSection } from "@/lib/study-content";
+import { moduleNumber, parsePracticeItems, sectionsForLos, tagSections, useSubjectContent, type ContentSection } from "@/lib/study-content";
+import { AnswerChoice, QuestionText } from "@/components/seefaa/question";
 import { REFERENCE_FORMULAS, referenceMatches } from "@/lib/formula-reference";
 import { cn } from "@/lib/utils";
 
@@ -111,7 +112,7 @@ function StudyModule() {
             {content && !mc && <p className="text-sm text-muted-foreground">No lesson text is available for this module.</p>}
             {mc && !sections.length && <p className="text-sm text-muted-foreground">No lessons are tagged to this LOS in the source. Show all lessons to read the full module.</p>}
             <div className="space-y-3">
-              {sections.map((s, i) => <Lesson key={`${losFilter}-${i}`} s={s} open={open === i} onToggle={() => setOpen(open === i ? -1 : i)} />)}
+              {sections.map((s, i) => <Lesson key={`${losFilter}-${i}`} s={s} moduleTitle={mod.title} open={open === i} onToggle={() => setOpen(open === i ? -1 : i)} />)}
             </div>
           </div>
 
