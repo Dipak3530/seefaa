@@ -34,7 +34,7 @@ export function QuestionCard({ number, eyebrow, stem, choices, choiceState, onSe
   number?: string | number; eyebrow?: string; stem: string;
   choices: { label: string; text: string }[];
   choiceState?: (label: string) => "default" | "selected" | "correct" | "incorrect";
-  onSelect?: (label: string) => void; disabled?: boolean;
+  onSelect?: ((label: string) => void) | undefined; disabled?: boolean | undefined;
 }) {
   return <div className="space-y-4">
     <article className="question-reading rounded-lg border border-border bg-card p-4 sm:p-6">

@@ -156,7 +156,7 @@ function StudyModule() {
   );
 }
 
-function Lesson({ s, moduleTitle, open, onToggle }: { s: ContentSection; moduleTitle: string; open: boolean; onToggle: () => void }) {
+function Lesson({ s, moduleTitle, subjectId, moduleId, open, onToggle }: { s: ContentSection; moduleTitle: string; subjectId: string; moduleId: string; open: boolean; onToggle: () => void }) {
   const isPractice = /practice problem/i.test(s.title);
   const isSolutions = /^solutions?$/i.test(s.title.trim());
   const items = useMemo(() => (isPractice || isSolutions) ? parsePracticeItems(s.blocks, [s.title, moduleTitle]) : [], [s, moduleTitle, isPractice, isSolutions]);
