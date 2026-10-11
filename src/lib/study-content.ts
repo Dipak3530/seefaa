@@ -44,7 +44,7 @@ export function sectionsForLos(sections: ContentSection[], los: number | null) {
   return sections.filter((s) => s.los.includes(los));
 }
 
-export type PracticeQuestion = { n: number; stem: string; choices: { label: string; text: string }[]; vignette?: string };
+export type PracticeQuestion = { n: number; stem: string; choices: { label: string; text: string }[]; vignette?: string; solution?: string };
 
 /**
  * Split a run-on "Practice Problems" / "Solutions" extraction into numbered items.
@@ -59,8 +59,41 @@ export function parsePracticeItems(blocks: ContentBlock[], noise: string[] = [])
   let text = blocks.map((b) => b.x).join(" ").replace(/­/g, "").trim();
   for (const n of noise) if (n) text = text.split(n).join(" ");
   const tabbed = splitNumbered(text, /(\d{1,2})\.\t/, /([A-F])\.\t/);
-  if (tabbed.length >= 2) return tabbed;
-  return splitProse(text);
+  if (tabbed.length >= 2) return mergeSolutions(tabbed);
+  return mergeSolutions(splitProse(text));
+}
+
+const SOLUTION_PHRASING = /^([A-F])\s+is correct|^The correct (?:response|answer) is/i;
+
+/**
+ * Many practice sections append their answer key as a second numbered run
+ * (restarting at 1) or as paragraphs phrased "B is correct. …". Those are not
+ * questions: fold them onto the question with the same number as its solution.
+ */
+function mergeSolutions(items: PracticeQuestion[]): PracticeQuestion[] {
+  const out: PracticeQuestion[] = [];
+  const byN = new Map<number, PracticeQuestion>();
+  let solutionRun = false;
+  for (const q of items) {
+    if (!solutionRun && out.length && q.n <= out[out.length - 1].n) solutionRun = true;
+    if (solutionRun || SOLUTION_PHRASING.test(q.stem)) {
+      const target = byN.get(q.n);
+      if (target) {
+        const text = [q.stem, ...q.choices.map((c) => `${c.label}. ${c.text}`)].join(" ");
+        target.solution = [target.solution, text].filter(Boolean).join(" ");
+      }
+      continue;
+    }
+    byN.set(q.n, q);
+    out.push(q);
+  }
+  return out;
+}
+
+/** The verified correct letter when the source solution states one. */
+export function solutionLetter(q: PracticeQuestion): string | null {
+  const m = q.solution?.match(/^([A-F])\s+is correct|^The correct (?:response|answer) is\s+([A-F])/i);
+  return m ? (m[1] ?? m[2]).toUpperCase() : null;
 }
 
 function splitNumbered(text: string, numRe: RegExp, choiceRe: RegExp): PracticeQuestion[] {
