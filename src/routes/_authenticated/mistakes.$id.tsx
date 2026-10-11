@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Panel, Markdown, NativeSelect } from "@/components/seefaa/bits";
 import { QuizRunner } from "@/components/seefaa/quiz";
-import { AnswerChoice, QuestionText } from "@/components/seefaa/question";
+import { AnswerChoice, QuestionCard, QuestionText } from "@/components/seefaa/question";
 import { useCurriculum, useInvalidate } from "@/hooks/use-seefaa";
 import { ERROR_CATEGORIES, categoryLabel, fmtDate } from "@/lib/cfa";
 import type { TablesUpdate } from "@/integrations/supabase/types";
@@ -138,10 +138,8 @@ function MistakeDetail() {
               </div>
             ) : (
               <>
-                <article className="question-reading rounded-lg border border-border bg-card p-4 sm:p-6">
-                  <QuestionText text={m.question} />
-                </article>
-                {choices.length > 0 && <div className="mt-5 space-y-3"><p className="text-[11px] font-bold uppercase text-muted-foreground">Answer choices</p>{choices.map((c) => <AnswerChoice key={c.label} label={c.label} text={c.text} state={m.correct_verified && c.label === m.correct_answer ? "correct" : c.label === m.selected_answer ? "selected" : "default"} />)}</div>}
+                <QuestionCard eyebrow="Logged question" stem={m.question} choices={choices} choiceState={(l) => m.correct_verified && l === m.correct_answer ? "correct" : l === m.selected_answer ? "selected" : "default"} />
+
                 <div className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
                   <div className="border-l-4 border-primary bg-accent/40 p-4"><p className="mb-2 text-xs font-semibold text-muted-foreground">Your answer</p><p className="break-words font-display text-lg font-bold">{m.selected_answer ?? "Not recorded"}</p>{choices.find((c) => c.label === m.selected_answer) && <p className="mt-2 text-sm leading-6">{choices.find((c) => c.label === m.selected_answer)?.text}</p>}</div>
                   <div className="border-l-4 border-info bg-info/5 p-4"><p className="mb-2 text-xs font-semibold text-muted-foreground">Recorded correct answer</p><p className="break-words font-display text-lg font-bold">{m.correct_answer ?? "Not recorded"}</p>{choices.find((c) => c.label === m.correct_answer) && <p className="mt-2 text-sm leading-6">{choices.find((c) => c.label === m.correct_answer)?.text}</p>}{m.correct_answer && <p className="mt-2 text-xs font-semibold text-info">{m.correct_verified ? "✓ Verified" : "Unverified"}</p>}</div>

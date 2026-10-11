@@ -28,3 +28,24 @@ export function AnswerChoice({ label, text, state = "default", onSelect, disable
     state === "incorrect" && "border-destructive bg-destructive/5");
   return onSelect ? <Button variant="outline" onClick={onSelect} disabled={disabled} aria-pressed={state === "selected"} className={cn(className, "h-auto justify-start whitespace-normal")}>{content}</Button> : <div className={className}>{content}</div>;
 }
+
+/** Single standard question layout used by the mistake bank and the study portal. */
+export function QuestionCard({ number, eyebrow, stem, choices, choiceState }: {
+  number?: string | number; eyebrow?: string; stem: string;
+  choices: { label: string; text: string }[];
+  choiceState?: (label: string) => "default" | "selected" | "correct" | "incorrect";
+}) {
+  return <div className="space-y-4">
+    <article className="question-reading rounded-lg border border-border bg-card p-4 sm:p-6">
+      {(number != null || eyebrow) && <div className="mb-3 flex items-center gap-3">
+        {number != null && <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-primary bg-accent font-display text-sm font-extrabold text-primary">{number}</span>}
+        <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">{eyebrow ?? "Question"}</span>
+      </div>}
+      <QuestionText text={stem} />
+    </article>
+    {choices.length > 0 && <div className="space-y-3">
+      <p className="text-[11px] font-bold uppercase text-muted-foreground">Answer choices</p>
+      {choices.map((c) => <AnswerChoice key={c.label} label={c.label} text={c.text} state={choiceState?.(c.label) ?? "default"} />)}
+    </div>}
+  </div>;
+}
