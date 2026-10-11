@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
 });
 
 type Status = "not_started" | "partial" | "completed";
-const STEPS = ["Welcome", "Exam date", "Your starting point", "Confidence", "Study time", "Schedule", "First subject", "Your plan"];
+const STEPS = ["Welcome", "Exam date", "Your starting point", "Confidence", "Study time", "Schedule", "First subject", "AI key", "Your plan"];
 
 function Onboarding() {
   const { data: cur } = useCurriculum();
@@ -32,6 +32,10 @@ function Onboarding() {
   const [days, setDays] = useState<number[]>([1, 2, 3, 4, 5, 6]);
   const [target, setTarget] = useState("");
   const [first, setFirst] = useState("");
+  const [aiProvider, setAiProvider] = useState<"openai" | "anthropic" | "gemini">("openai");
+  const [aiKey, setAiKey] = useState("");
+  const [keySaved, setKeySaved] = useState(false);
+  const [keyBusy, setKeyBusy] = useState(false);
   const [busy, setBusy] = useState(false);
   if (!cur) return null;
   const subjects = cur.subjects;
