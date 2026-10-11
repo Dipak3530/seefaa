@@ -36,6 +36,16 @@ function ModulePractice({ moduleId }: { moduleId: string }) {
     title: s.title, items: parsePracticeItems(s.blocks, [s.title, mod?.title ?? ""]),
   })) ?? [], [mc, mod?.title]);
   const questionCount = sets.reduce((sum, set) => sum + set.items.length, 0);
+  const { data: logged } = useQuery({
+    queryKey: ["module-logged-questions", moduleId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("mistakes").select("*").eq("module_id", moduleId).order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+  // Website questions answered wrongly are already shown above as website questions; only user-logged (screenshot/manual) ones appear here.
+  const mine = (logged ?? []).filter(m => !(m.notes ?? "").startsWith("Logged from the Study Portal"));
 
   if (!cur || !prog || !attempt || !profile) return <p className="text-muted-foreground">Loading…</p>;
   if (!mod) return <p>Module not found.</p>;
