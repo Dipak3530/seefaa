@@ -59,13 +59,13 @@ export function parsePracticeItems(blocks: ContentBlock[], noise: string[] = [])
   const items: PracticeQuestion[] = [];
   for (let i = 1; i + 1 < parts.length; i += 2) {
     const n = Number(parts[i]);
-    const body = parts[i + 1].replace(/\s+/g, " ").trim();
+    const body = parts[i + 1].trim();
     if (!n || !body) continue;
     const segs = body.split(/([A-F])\.\t/);
-    const stem = segs[0].trim();
+    const stem = segs[0].replace(/\s+/g, " ").trim();
     const choices: { label: string; text: string }[] = [];
     for (let j = 1; j + 1 < segs.length; j += 2) {
-      const ct = segs[j + 1].trim();
+      const ct = segs[j + 1].replace(/\s+/g, " ").trim();
       if (ct) choices.push({ label: segs[j], text: ct });
     }
     items.push({ n, stem, choices });
