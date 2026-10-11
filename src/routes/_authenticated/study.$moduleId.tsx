@@ -8,7 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Bar, NativeSelect, Panel } from "@/components/seefaa/bits";
 import { Button } from "@/components/ui/button";
 import { useAttempt, useCurriculum, useInvalidate, useProfile, useProgress } from "@/hooks/use-seefaa";
-import { moduleNumber, sectionsForLos, tagSections, useSubjectContent, type ContentSection } from "@/lib/study-content";
+import { moduleNumber, parsePracticeItems, sectionsForLos, tagSections, useSubjectContent, type ContentSection } from "@/lib/study-content";
+import { AnswerChoice, QuestionText } from "@/components/seefaa/question";
 import { REFERENCE_FORMULAS, referenceMatches } from "@/lib/formula-reference";
 import { cn } from "@/lib/utils";
 
@@ -111,7 +112,7 @@ function StudyModule() {
             {content && !mc && <p className="text-sm text-muted-foreground">No lesson text is available for this module.</p>}
             {mc && !sections.length && <p className="text-sm text-muted-foreground">No lessons are tagged to this LOS in the source. Show all lessons to read the full module.</p>}
             <div className="space-y-3">
-              {sections.map((s, i) => <Lesson key={`${losFilter}-${i}`} s={s} open={open === i} onToggle={() => setOpen(open === i ? -1 : i)} />)}
+              {sections.map((s, i) => <Lesson key={`${losFilter}-${i}`} s={s} moduleTitle={mod.title} open={open === i} onToggle={() => setOpen(open === i ? -1 : i)} />)}
             </div>
           </div>
 
@@ -155,20 +156,41 @@ function StudyModule() {
   );
 }
 
-function Lesson({ s, open, onToggle }: { s: ContentSection; open: boolean; onToggle: () => void }) {
+function Lesson({ s, moduleTitle, open, onToggle }: { s: ContentSection; moduleTitle: string; open: boolean; onToggle: () => void }) {
+  const isPractice = /practice problem/i.test(s.title);
+  const isSolutions = /^solutions?$/i.test(s.title.trim());
+  const items = useMemo(() => (isPractice || isSolutions) ? parsePracticeItems(s.blocks, [s.title, moduleTitle]) : [], [s, moduleTitle, isPractice, isSolutions]);
   return (
     <article className="card-soft overflow-hidden">
       <button onClick={onToggle} className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4 text-left">
-        <span className="min-w-0 font-bold">{s.title}</span>
+        <span className="min-w-0 font-bold">{s.title}{items.length > 0 && <span className="ml-2 text-xs font-medium text-muted-foreground">{items.length} {isSolutions ? "worked solutions" : "questions"}</span>}</span>
         <span className="flex gap-1">{s.los.map((n) => <span key={n} className="rounded bg-accent px-1.5 py-0.5 text-[10px] font-bold text-primary">LOS {n}</span>)}</span>
       </button>
-      {open && (
+      {open && (items.length > 0 ? (
+        <ol className="space-y-4 border-t px-4 py-4 md:px-6">
+          {items.map((q) => (
+            <li key={q.n} className="rounded-lg border bg-background p-4">
+              <div className="flex items-start gap-3">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md border-2 border-primary bg-accent font-display text-sm font-extrabold text-primary">{q.n}</span>
+                <div className="min-w-0 flex-1">
+                  <QuestionText text={q.stem} />
+                  {q.choices.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      {q.choices.map((c) => <AnswerChoice key={c.label} label={c.label} text={c.text} />)}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      ) : (
         <div className="space-y-3 border-t px-4 py-4 text-[15px] leading-7 md:px-6">
           {s.blocks.map((b, i) => b.t === "h" ? <h4 key={i} className="pt-2 font-display font-bold text-primary">{b.x}</h4>
             : b.t === "table" ? <pre key={i} className="overflow-x-auto rounded-md border bg-background p-3 font-mono text-xs leading-5">{b.x}</pre>
             : <p key={i} className="break-words">{b.x}</p>)}
         </div>
-      )}
+      ))}
     </article>
   );
 }

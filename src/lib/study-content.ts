@@ -43,3 +43,32 @@ export function sectionsForLos(sections: ContentSection[], los: number | null) {
   if (los == null) return sections;
   return sections.filter((s) => s.los.includes(los));
 }
+
+export type PracticeQuestion = { n: number; stem: string; choices: { label: string; text: string }[] };
+
+/**
+ * Split a run-on "Practice Problems" / "Solutions" extraction into numbered items.
+ * The PDF text arrives as one paragraph: "1.\t stem A.\t x. B.\t y. C.\t z. 2.\t …",
+ * with page headers (module title, "Practice Problems") embedded mid-sentence.
+ * Presentation only — never invents or alters content.
+ */
+export function parsePracticeItems(blocks: ContentBlock[], noise: string[] = []): PracticeQuestion[] {
+  let text = blocks.map((b) => b.x).join(" ").replace(/­/g, "").trim();
+  for (const n of noise) if (n) text = text.split(n).join(" ");
+  const parts = text.split(/(\d{1,2})\.\t/);
+  const items: PracticeQuestion[] = [];
+  for (let i = 1; i + 1 < parts.length; i += 2) {
+    const n = Number(parts[i]);
+    const body = parts[i + 1].trim();
+    if (!n || !body) continue;
+    const segs = body.split(/([A-F])\.\t/);
+    const stem = segs[0].replace(/\s+/g, " ").trim();
+    const choices: { label: string; text: string }[] = [];
+    for (let j = 1; j + 1 < segs.length; j += 2) {
+      const ct = segs[j + 1].replace(/\s+/g, " ").trim();
+      if (ct) choices.push({ label: segs[j], text: ct });
+    }
+    items.push({ n, stem, choices });
+  }
+  return items;
+}
