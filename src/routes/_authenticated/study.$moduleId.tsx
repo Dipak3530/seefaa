@@ -10,6 +10,8 @@ import { useAttempt, useCurriculum, useInvalidate, useProfile, useProgress } fro
 import { moduleNumber, parsePracticeItems, solutionLetter, useSubjectContent, type PracticeQuestion } from "@/lib/study-content";
 import { QuestionCard, QuestionText } from "@/components/seefaa/question";
 import { cn } from "@/lib/utils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Tables } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/study/$moduleId")({
   head: () => ({ meta: pageMeta("Module practice & LOS — SEEFAA", "Interactive CFA Level I module practice questions and learning outcome progress.") }),
