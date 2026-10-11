@@ -127,7 +127,11 @@ function splitProse(text: string): PracticeQuestion[] {
   let m: RegExpExecArray | null;
   while ((m = re.exec(text))) {
     const n = Number(m[1]);
-    if (n !== expected) continue;
+    if (n !== expected) {
+      // A run restarting at 1 after questions have started is the answer key.
+      if (n === 1 && starts.length) expected = 1;
+      else continue;
+    }
     starts.push({ n, from: m.index + m[0].indexOf(m[1]), to: m.index + m[0].length });
     expected++;
   }
