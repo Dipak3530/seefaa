@@ -170,7 +170,9 @@ function Lesson({ s, moduleTitle, open, onToggle }: { s: ContentSection; moduleT
         <ol className="space-y-6 border-t px-4 py-4 md:px-6">
           {items.map((q) => (
             <li key={q.n}>
-              <QuestionCard number={q.n} eyebrow={isSolutions ? "Worked solution" : "Practice question"} stem={q.stem} choices={q.choices} />
+              {isSolutions || q.choices.length === 0
+                ? <QuestionCard number={q.n} eyebrow={isSolutions ? "Worked solution" : "Practice question"} stem={q.stem} choices={q.choices} />
+                : <PortalQuestion q={q} subjectId={subjectId} moduleId={moduleId} />}
             </li>
           ))}
         </ol>
