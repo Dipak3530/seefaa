@@ -28,6 +28,8 @@ import { Route as AuthenticatedCurriculumIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedCurriculumSubjectIdRouteImport } from './routes/_authenticated/curriculum.$subjectId'
 import { Route as AuthenticatedMistakesIndexRouteImport } from './routes/_authenticated/mistakes.index'
 import { Route as AuthenticatedMistakesIdRouteImport } from './routes/_authenticated/mistakes.$id'
+import { Route as AuthenticatedStudyIndexRouteImport } from './routes/_authenticated/study.index'
+import { Route as AuthenticatedStudyModuleIdRouteImport } from './routes/_authenticated/study.$moduleId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -127,6 +129,17 @@ const AuthenticatedMistakesIdRoute = AuthenticatedMistakesIdRouteImport.update({
   path: '/mistakes/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStudyIndexRoute = AuthenticatedStudyIndexRouteImport.update({
+  id: '/study/',
+  path: '/study/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStudyModuleIdRoute =
+  AuthenticatedStudyModuleIdRouteImport.update({
+    id: '/study/$moduleId',
+    path: '/study/$moduleId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -145,8 +158,10 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/curriculum/$subjectId': typeof AuthenticatedCurriculumSubjectIdRoute
   '/mistakes/$id': typeof AuthenticatedMistakesIdRoute
+  '/study/$moduleId': typeof AuthenticatedStudyModuleIdRoute
   '/curriculum/': typeof AuthenticatedCurriculumIndexRoute
   '/mistakes/': typeof AuthenticatedMistakesIndexRoute
+  '/study/': typeof AuthenticatedStudyIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -165,8 +180,10 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/curriculum/$subjectId': typeof AuthenticatedCurriculumSubjectIdRoute
   '/mistakes/$id': typeof AuthenticatedMistakesIdRoute
+  '/study/$moduleId': typeof AuthenticatedStudyModuleIdRoute
   '/curriculum': typeof AuthenticatedCurriculumIndexRoute
   '/mistakes': typeof AuthenticatedMistakesIndexRoute
+  '/study': typeof AuthenticatedStudyIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -187,8 +204,10 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/curriculum/$subjectId': typeof AuthenticatedCurriculumSubjectIdRoute
   '/_authenticated/mistakes/$id': typeof AuthenticatedMistakesIdRoute
+  '/_authenticated/study/$moduleId': typeof AuthenticatedStudyModuleIdRoute
   '/_authenticated/curriculum/': typeof AuthenticatedCurriculumIndexRoute
   '/_authenticated/mistakes/': typeof AuthenticatedMistakesIndexRoute
+  '/_authenticated/study/': typeof AuthenticatedStudyIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -209,8 +228,10 @@ export interface FileRouteTypes {
     | '/settings'
     | '/curriculum/$subjectId'
     | '/mistakes/$id'
+    | '/study/$moduleId'
     | '/curriculum/'
     | '/mistakes/'
+    | '/study/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -229,8 +250,10 @@ export interface FileRouteTypes {
     | '/settings'
     | '/curriculum/$subjectId'
     | '/mistakes/$id'
+    | '/study/$moduleId'
     | '/curriculum'
     | '/mistakes'
+    | '/study'
   id:
     | '__root__'
     | '/'
@@ -250,8 +273,10 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/curriculum/$subjectId'
     | '/_authenticated/mistakes/$id'
+    | '/_authenticated/study/$moduleId'
     | '/_authenticated/curriculum/'
     | '/_authenticated/mistakes/'
+    | '/_authenticated/study/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -396,6 +421,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMistakesIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/study/': {
+      id: '/_authenticated/study/'
+      path: '/study'
+      fullPath: '/study/'
+      preLoaderRoute: typeof AuthenticatedStudyIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/study/$moduleId': {
+      id: '/_authenticated/study/$moduleId'
+      path: '/study/$moduleId'
+      fullPath: '/study/$moduleId'
+      preLoaderRoute: typeof AuthenticatedStudyModuleIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -413,8 +452,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedCurriculumSubjectIdRoute: typeof AuthenticatedCurriculumSubjectIdRoute
   AuthenticatedMistakesIdRoute: typeof AuthenticatedMistakesIdRoute
+  AuthenticatedStudyModuleIdRoute: typeof AuthenticatedStudyModuleIdRoute
   AuthenticatedCurriculumIndexRoute: typeof AuthenticatedCurriculumIndexRoute
   AuthenticatedMistakesIndexRoute: typeof AuthenticatedMistakesIndexRoute
+  AuthenticatedStudyIndexRoute: typeof AuthenticatedStudyIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -431,8 +472,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedCurriculumSubjectIdRoute: AuthenticatedCurriculumSubjectIdRoute,
   AuthenticatedMistakesIdRoute: AuthenticatedMistakesIdRoute,
+  AuthenticatedStudyModuleIdRoute: AuthenticatedStudyModuleIdRoute,
   AuthenticatedCurriculumIndexRoute: AuthenticatedCurriculumIndexRoute,
   AuthenticatedMistakesIndexRoute: AuthenticatedMistakesIndexRoute,
+  AuthenticatedStudyIndexRoute: AuthenticatedStudyIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
