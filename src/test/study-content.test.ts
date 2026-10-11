@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { tagSections, sectionsForLos } from "@/lib/study-content";
+import { tagSections, sectionsForLos, parsePracticeItems } from "@/lib/study-content";
 
 const mc = { num: 1, los: ["determine and interpret breakeven points", "describe market structures"], sections: [
   { title: "Overview", los: [], blocks: [{ t: "p" as const, x: "intro" }] },
