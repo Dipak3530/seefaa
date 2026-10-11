@@ -202,3 +202,49 @@ function PortalQuestion({ q, subjectId, moduleId }: { q: PracticeQuestion; subje
     </div>
   );
 }
+
+function LoggedQuestion({ m, n }: { m: Tables<"mistakes">; n: number }) {
+  const inv = useInvalidate();
+  const qc = useQueryClient();
+  const choices = (Array.isArray(m.choices) ? m.choices : []) as { label: string; text: string }[];
+  const answer = m.correct_answer && choices.some(c => c.label === m.correct_answer) ? m.correct_answer : null;
+  const [picked, setPicked] = useState<string | null>(null);
+  const [result, setResult] = useState<"right" | "wrong" | null>(null);
+
+  async function record(label: string, correct: boolean) {
+    const { error } = await supabase.from("mistake_attempts").insert({ user_id: m.user_id, mistake_id: m.id, answer: label, is_correct: correct });
+    if (error) return toast.error(error.message);
+    setResult(correct ? "right" : "wrong");
+    toast.success(correct ? "Correct — review pushed further out" : "Recorded — this one comes back tomorrow");
+    inv(); qc.invalidateQueries({ queryKey: ["module-logged-questions", m.module_id] });
+  }
+  function choose(label: string) {
+    if (result) return;
+    setPicked(label);
+    if (answer) record(label, label === answer);
+  }
+
+  return (
+    <div className="space-y-3">
+      <QuestionCard number={n} eyebrow={m.concept ? `Your logged question · ${m.concept}` : "Your logged question"} stem={m.question} choices={choices}
+        choiceState={(l) => {
+          if (l === picked) return result === "right" ? "correct" : result === "wrong" ? "incorrect" : "selected";
+          if (result && answer && l === answer) return "correct";
+          return "default";
+        }}
+        onSelect={result ? undefined : choose} />
+      {picked && !result && !answer && (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-card p-3">
+          <span className="mr-auto text-sm">You chose <b>{picked}</b>. No answer key saved — self-check:</span>
+          <Button size="sm" variant="outline" onClick={() => record(picked, true)}>I got it right</Button>
+          <Button size="sm" onClick={() => record(picked, false)}>I got it wrong</Button>
+        </div>
+      )}
+      <div className="flex flex-wrap items-center gap-3 text-sm">
+        {result && <span className="mr-auto font-semibold">{result === "right" ? "Correct — nice work." : `Not quite${answer ? ` — answer is ${answer}` : ""}.`}</span>}
+        <Link to="/mistakes/$id" params={{ id: m.id }} className="font-bold text-primary underline">Open in mistake bank</Link>
+        {result && <Button size="sm" variant="ghost" onClick={() => { setPicked(null); setResult(null); }}>Try again</Button>}
+      </div>
+    </div>
+  );
+}
