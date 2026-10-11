@@ -10,6 +10,7 @@ import { Logo } from "@/components/seefaa/app-shell";
 import { useCurriculum, useInvalidate } from "@/hooks/use-seefaa";
 import { WEEKDAYS, ETHICS_ID } from "@/lib/cfa";
 import { applyPlan, proposePlan } from "@/lib/plan-actions";
+import { saveAiKey } from "@/lib/ai.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
