@@ -2,9 +2,9 @@ import { pageMeta } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { BookOpenText, ChevronLeft } from "lucide-react";
+import { Play, ChevronLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { PageHeader, Bar, NativeSelect } from "@/components/seefaa/bits";
+import { PageHeader, Bar, NativeSelect, Stat } from "@/components/seefaa/bits";
 import { useAttempt, useCurriculum, useInvalidate, useProfile, useProgress } from "@/hooks/use-seefaa";
 import { fmtDate } from "@/lib/cfa";
 import { cn } from "@/lib/utils";
@@ -44,6 +44,10 @@ function SubjectPage() {
   const mods = cur.modulesOf(subjectId);
   const pm = (id: string) => prog.modules.find((m) => m.module_id === id);
   const d = mods.filter((m) => pm(m.id)?.status === "completed").length;
+  const subjectLos = cur.los.filter(l => mods.some(m => m.id === l.module_id));
+  const mastered = subjectLos.filter(l => prog.los.some(p => p.los_id === l.id && p.status === "completed")).length;
+  const totalQuestions = (extra?.practice ?? []).reduce((sum, p) => sum + p.total, 0);
+  const correctQuestions = (extra?.practice ?? []).reduce((sum, p) => sum + p.correct, 0);
 
   async function setModule(moduleId: string, patch: { status?: string; confidence?: string | null }) {
     const existing = pm(moduleId);
@@ -64,7 +68,13 @@ function SubjectPage() {
   return (
     <div>
       <Link to="/curriculum" className="mb-3 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"><ChevronLeft className="h-4 w-4" /> All subjects</Link>
-      <PageHeader title={subject.name} subtitle={`${d} of ${mods.length} modules complete`} actions={<><Button asChild variant="outline"><Link to="/formulas">Formula notebook</Link></Button><Button asChild><Link to="/mistakes">Review mistakes</Link></Button></>} />
+      <PageHeader title={subject.name} subtitle={`${d} of ${mods.length} modules complete`} />
+      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat label="Modules complete" value={`${d}/${mods.length}`} />
+        <Stat label="LOS mastered" value={`${mastered}/${subjectLos.length}`} />
+        <Stat label="Practice accuracy" value={totalQuestions ? `${Math.round(correctQuestions / totalQuestions * 100)}%` : "—"} hint={`${totalQuestions} questions in recorded sessions`} />
+        <Stat label="Linked mistakes" value={extra ? extra.mistakes.length : "—"} />
+      </div>
       <Bar value={(d / Math.max(1, mods.length)) * 100} className="mb-6 h-3" />
       <div className="mb-5 grid gap-3 sm:grid-cols-[minmax(0,1fr)_180px]">
         <Input value={query} onChange={e => setQuery(e.target.value)} aria-label="Search subject modules" placeholder="Search this subject…" className="bg-card" />
@@ -90,7 +100,7 @@ function SubjectPage() {
                     {p?.studied_on ? `Studied ${fmtDate(p.studied_on)} · ` : ""}{mistakes} linked mistake{mistakes === 1 ? "" : "s"}{acc != null ? ` · practice ${acc}% (${tot} Qs)` : ""}
                   </p>
                 </div>
-                <Button asChild size="sm" className="col-start-2 sm:col-start-auto"><Link to="/study/$moduleId" params={{ moduleId: m.id }}><BookOpenText className="mr-1 h-3.5 w-3.5" />Study</Link></Button>
+                 <Button asChild size="sm" className="col-start-2 sm:col-start-auto"><Link to="/study/$moduleId" params={{ moduleId: m.id }}><Play className="mr-1 h-3.5 w-3.5" />Practice</Link></Button>
                 <NativeSelect className="col-start-2 w-full sm:col-start-auto sm:w-36" value={p?.status ?? "not_started"} onChange={(e) => setModule(m.id, { status: e.target.value })} aria-label="Status">
                   <option value="not_started">Not started</option><option value="in_progress">In progress</option><option value="completed">Completed</option>
                 </NativeSelect>
