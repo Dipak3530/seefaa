@@ -133,7 +133,7 @@ function Analytics() {
       </div>
 
       <Panel title="Past timer sessions">
-        {!data.timers.length ? <Empty title="No sessions yet" body="Start Studying or Start Revision from the dashboard." /> : (
+        {!data.timers.length ? <Empty title="No sessions yet" body="Use the Study Timer or Revision Timer on the dashboard." /> : (
           <div className="max-h-96 overflow-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="py-2">When</th><th>Type</th><th>Subject / module</th><th>Minutes</th><th /></tr></thead>

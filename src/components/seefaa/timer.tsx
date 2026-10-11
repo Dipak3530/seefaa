@@ -75,10 +75,10 @@ export function TimerStartButtons() {
       </div>
       <div className="grid grid-cols-2 gap-3">
         <Button size="lg" className="h-12 min-w-0 px-2 text-xs sm:text-sm" onClick={() => start("study")} disabled={!!open || !!starting} loading={starting === "study"}>
-          <BookOpen className="h-4 w-4" /> Start Studying
+          <BookOpen className="h-4 w-4" /> Study Timer
         </Button>
         <Button size="lg" variant="info" className="h-12 min-w-0 px-2 text-xs sm:text-sm" onClick={() => start("revision")} disabled={!!open || !!starting} loading={starting === "revision"}>
-          <RotateCcw className="h-4 w-4" /> Start Revision
+          <RotateCcw className="h-4 w-4" /> Revision Timer
         </Button>
       </div>
     </div>
