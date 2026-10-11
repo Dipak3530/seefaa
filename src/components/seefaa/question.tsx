@@ -30,10 +30,11 @@ export function AnswerChoice({ label, text, state = "default", onSelect, disable
 }
 
 /** Single standard question layout used by the mistake bank and the study portal. */
-export function QuestionCard({ number, eyebrow, stem, choices, choiceState }: {
+export function QuestionCard({ number, eyebrow, stem, choices, choiceState, onSelect, disabled }: {
   number?: string | number; eyebrow?: string; stem: string;
   choices: { label: string; text: string }[];
   choiceState?: (label: string) => "default" | "selected" | "correct" | "incorrect";
+  onSelect?: ((label: string) => void) | undefined; disabled?: boolean | undefined;
 }) {
   return <div className="space-y-4">
     <article className="question-reading rounded-lg border border-border bg-card p-4 sm:p-6">
