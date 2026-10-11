@@ -1,4 +1,6 @@
 # SEEFAA roadmap
+- [ ] Remove book reading from the portal; retain subject analytics, modules, LOS titles and interactive practice
+- [ ] Verify the streamlined subject-to-module practice flow
 - [x] Polish existing saved question with a clear concept heading, highlighted prompt, structured data and explicit answer summaries; verified desktop/mobile and retry selection without editing saved data
 - [x] Structure all logged question displays with readable tables, answer choices and mobile-friendly spacing; verified existing saved question and retry selection on desktop/mobile without changing saved data
 - [x] Add uploaded 2025 cheat-sheet formulas by subject without changing personal formulas or 2027 curriculum
