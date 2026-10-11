@@ -21,4 +21,4 @@
 - Plan generation is a pure function in `src/lib/planner.ts` (tested); applying a plan only replaces future undone tasks.
 - AI calls live in `src/lib/ai.functions.ts` (server-only via createServerFn, per-user daily quota via `ai_usage`); explanations are stored in `ai_explanations` to avoid repeat calls. Files under `src/server/` cannot be imported by routes — the build treats them as server-only, so server functions must live elsewhere.
 - Curriculum is versioned (`curriculum_versions` → subjects → modules → los); progress rows reference an exam attempt so attempts never overwrite each other.
-- Study Portal lesson text lives in a private storage bucket as one JSON file per subject (extracted from the uploaded 2027 PDFs), while LOS rows live in the los table; keeps 9MB of copyrighted text out of the bundle and behind sign-in.
+- Study Portal projects private per-subject source JSON into practice sections and answer keys only; LOS titles come from curriculum rows and existing progress hooks remain authoritative, preventing textbook reading from appearing while preserving question grading.

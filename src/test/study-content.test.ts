@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { tagSections, sectionsForLos, parsePracticeItems } from "@/lib/study-content";
+import { tagSections, sectionsForLos, parsePracticeItems, practiceOnlyModules } from "@/lib/study-content";
 
 const mc = { num: 1, los: ["determine and interpret breakeven points", "describe market structures"], sections: [
   { title: "Overview", los: [], blocks: [{ t: "p" as const, x: "intro" }] },
@@ -17,6 +17,24 @@ describe("study content LOS tagging", () => {
   });
   it("filters lessons to a single LOS", () => {
     expect(sectionsForLos(tagSections(mc), 2).map((s) => s.title)).toEqual(["Structures"]);
+  });
+});
+
+describe("practice-only portal", () => {
+  it("excludes all book reading while retaining practice and answer keys", () => {
+    const modules = [{ ...mc, sections: [...mc.sections,
+      { title: "Practice Problems", los: [], blocks: [{ t: "p" as const, x: "1. Question A. One B. Two C. Three" }] },
+      { title: "Solutions", los: [], blocks: [{ t: "p" as const, x: "1. A is correct." }] },
+      { title: "Summary", los: [], blocks: [{ t: "p" as const, x: "Book reading" }] },
+    ] }];
+    const result = practiceOnlyModules(modules);
+    expect(result[0].sections.map(s => s.title)).toEqual(["Practice Problems", "Solutions"]);
+    expect(result[0].num).toBe(1);
+    expect(result[0].los).toEqual(mc.los);
+    expect(modules[0].sections).toHaveLength(7);
+  });
+  it("retains a module with no practice without falling back to book text", () => {
+    expect(practiceOnlyModules([mc])[0].sections).toEqual([]);
   });
 });
 

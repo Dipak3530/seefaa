@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-/** Lesson text extracted from the candidate's uploaded 2027 curriculum PDFs, stored privately per subject. */
+/** Private source extracts; only practice sections are exposed in the portal. */
 export type ContentBlock = { t: "p" | "h" | "table"; x: string };
 export type ContentSection = { title: string; los: number[]; blocks: ContentBlock[] };
 export type ModuleContent = { num: number; los: string[]; sections: ContentSection[] };
@@ -11,16 +11,24 @@ export function moduleNumber(moduleId: string) {
   return m ? Number(m[1]) : null;
 }
 
+/** Keep question sets and their source answer keys, never textbook reading sections. */
+export function practiceOnlyModules(modules: ModuleContent[]): ModuleContent[] {
+  return modules.map((module) => ({
+    ...module,
+    sections: module.sections.filter((section) => /practice problems?/i.test(section.title) || /^solutions?$/i.test(section.title.trim())),
+  }));
+}
+
 export function useSubjectContent(subjectId: string | undefined) {
   return useQuery({
-    queryKey: ["study-content", subjectId],
+    queryKey: ["study-practice-content", subjectId],
     enabled: !!subjectId,
     staleTime: Infinity,
     gcTime: 30 * 60_000,
     queryFn: async () => {
       const { data, error } = await supabase.storage.from("curriculum-content").download(`2027/${subjectId}.json`);
       if (error) throw error;
-      return JSON.parse(await data.text()) as ModuleContent[];
+      return practiceOnlyModules(JSON.parse(await data.text()) as ModuleContent[]);
     },
   });
 }
