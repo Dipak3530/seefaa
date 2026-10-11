@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { LayoutDashboard, CalendarDays, BookOpen, Camera, Library, RefreshCw, Target, ClipboardCheck, Sigma, BarChart3, Trophy, Settings, LogOut, Menu, Bell, ChevronDown, ArrowUpRight, GraduationCap } from "lucide-react";
+import { LayoutDashboard, CalendarDays, BookOpen, Camera, Library, RefreshCw, Target, ClipboardCheck, Sigma, BarChart3, Trophy, Settings, LogOut, Menu, Bell, ChevronDown, ArrowUpRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";

@@ -90,6 +90,7 @@ function SubjectPage() {
                     {p?.studied_on ? `Studied ${fmtDate(p.studied_on)} · ` : ""}{mistakes} linked mistake{mistakes === 1 ? "" : "s"}{acc != null ? ` · practice ${acc}% (${tot} Qs)` : ""}
                   </p>
                 </div>
+                <Button asChild size="sm" className="col-start-2 sm:col-start-auto"><Link to="/study/$moduleId" params={{ moduleId: m.id }}><BookOpenText className="mr-1 h-3.5 w-3.5" />Study</Link></Button>
                 <NativeSelect className="col-start-2 w-full sm:col-start-auto sm:w-36" value={p?.status ?? "not_started"} onChange={(e) => setModule(m.id, { status: e.target.value })} aria-label="Status">
                   <option value="not_started">Not started</option><option value="in_progress">In progress</option><option value="completed">Completed</option>
                 </NativeSelect>
