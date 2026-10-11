@@ -14,7 +14,6 @@ export const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/plan", label: "Study Planner", icon: CalendarDays },
   { to: "/curriculum", label: "Curriculum", icon: BookOpen },
-  { to: "/study", label: "Study Portal", icon: GraduationCap },
   { to: "/error-log", label: "Log a Mistake", icon: Camera },
   { to: "/mistakes", label: "Mistake Bank", icon: Library },
   { to: "/revision", label: "Revision Centre", icon: RefreshCw },
