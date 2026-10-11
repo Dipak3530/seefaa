@@ -10,6 +10,8 @@ import { useAttempt, useCurriculum, useInvalidate, useProfile, useProgress } fro
 import { moduleNumber, parsePracticeItems, solutionLetter, useSubjectContent, type PracticeQuestion } from "@/lib/study-content";
 import { QuestionCard, QuestionText } from "@/components/seefaa/question";
 import { cn } from "@/lib/utils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Tables } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/study/$moduleId")({
   head: () => ({ meta: pageMeta("Module practice & LOS — SEEFAA", "Interactive CFA Level I module practice questions and learning outcome progress.") }),
@@ -36,6 +38,16 @@ function ModulePractice({ moduleId }: { moduleId: string }) {
     title: s.title, items: parsePracticeItems(s.blocks, [s.title, mod?.title ?? ""]),
   })) ?? [], [mc, mod?.title]);
   const questionCount = sets.reduce((sum, set) => sum + set.items.length, 0);
+  const { data: logged } = useQuery({
+    queryKey: ["module-logged-questions", moduleId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("mistakes").select("*").eq("module_id", moduleId).order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+  // Website questions answered wrongly are already shown above as website questions; only user-logged (screenshot/manual) ones appear here.
+  const mine = (logged ?? []).filter(m => !(m.notes ?? "").startsWith("Logged from the Study Portal"));
 
   if (!cur || !prog || !attempt || !profile) return <p className="text-muted-foreground">Loading…</p>;
   if (!mod) return <p>Module not found.</p>;
@@ -88,12 +100,18 @@ function ModulePractice({ moduleId }: { moduleId: string }) {
           </li>)}
         </ul>}
       </Panel>
-      <Panel title="Practice questions" action={<Button onClick={() => setPracticing(v => !v)} disabled={isLoading || !questionCount}><Play className="mr-2 h-4 w-4" />{practicing ? "Close practice" : "Practice"}</Button>}>
-        {isLoading ? <p className="text-sm text-muted-foreground">Loading questions…</p> : error ? <p className="text-sm text-destructive">Couldn’t load practice questions. Please refresh.</p> : <p className="text-sm text-muted-foreground">{questionCount ? `${questionCount} questions` : "No practice questions available for this module."}</p>}
-        {practicing && <div className="mt-5 space-y-8">{sets.map((set, i) => <div key={i}>
+      <Panel title="Practice questions" action={<Button onClick={() => setPracticing(v => !v)} disabled={isLoading || !(questionCount + mine.length)}><Play className="mr-2 h-4 w-4" />{practicing ? "Close practice" : "Practice"}</Button>}>
+        {isLoading ? <p className="text-sm text-muted-foreground">Loading questions…</p> : error ? <p className="text-sm text-destructive">Couldn’t load practice questions. Please refresh.</p> : <p className="text-sm text-muted-foreground">{questionCount + mine.length ? `${questionCount} website questions · ${mine.length} your logged questions` : "No practice questions available for this module."}</p>}
+        {practicing && <div className="mt-5 space-y-8">
+          {mine.length > 0 && <div>
+            <p className="mb-3 inline-block rounded-full border-2 border-foreground bg-secondary px-3 py-1 text-xs font-bold uppercase">Your logged questions · {mine.length}</p>
+            <ol className="space-y-6">{mine.map((m, i) => <li key={m.id}><LoggedQuestion m={m} n={i + 1} /></li>)}</ol>
+          </div>}
+          {questionCount > 0 && <p className="inline-block rounded-full border-2 border-foreground bg-primary px-3 py-1 text-xs font-bold uppercase text-primary-foreground">Website questions · {questionCount}</p>}
+          {sets.map((set, i) => <div key={i}>
           <ol className="space-y-6">
             {set.items[0]?.vignette && <li className="rounded-lg border bg-accent/40 p-4"><p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Scenario</p><QuestionText text={set.items[0].vignette} /></li>}
-            {set.items.map(q => <li key={q.n}>{q.choices.length ? <PortalQuestion q={q} subjectId={mod.subject_id} moduleId={moduleId} /> : <QuestionCard number={q.n} eyebrow="Practice question" stem={q.stem} choices={q.choices} />}</li>)}
+            {set.items.map(q => <li key={q.n}>{q.choices.length ? <PortalQuestion q={q} subjectId={mod.subject_id} moduleId={moduleId} /> : <QuestionCard number={q.n} eyebrow="Website question" stem={q.stem} choices={q.choices} />}</li>)}
           </ol>
         </div>)}</div>}
       </Panel>
@@ -181,6 +199,52 @@ function PortalQuestion({ q, subjectId, moduleId }: { q: PracticeQuestion; subje
           {showSolution && <div className="mt-2 rounded-lg border bg-accent/40 p-4"><p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Curriculum solution</p><QuestionText text={q.solution} /></div>}
         </div>
       )}
+    </div>
+  );
+}
+
+function LoggedQuestion({ m, n }: { m: Tables<"mistakes">; n: number }) {
+  const inv = useInvalidate();
+  const qc = useQueryClient();
+  const choices = (Array.isArray(m.choices) ? m.choices : []) as { label: string; text: string }[];
+  const answer = m.correct_answer && choices.some(c => c.label === m.correct_answer) ? m.correct_answer : null;
+  const [picked, setPicked] = useState<string | null>(null);
+  const [result, setResult] = useState<"right" | "wrong" | null>(null);
+
+  async function record(label: string, correct: boolean) {
+    const { error } = await supabase.from("mistake_attempts").insert({ user_id: m.user_id, mistake_id: m.id, answer: label, is_correct: correct });
+    if (error) return toast.error(error.message);
+    setResult(correct ? "right" : "wrong");
+    toast.success(correct ? "Correct — review pushed further out" : "Recorded — this one comes back tomorrow");
+    inv(); qc.invalidateQueries({ queryKey: ["module-logged-questions", m.module_id] });
+  }
+  function choose(label: string) {
+    if (result) return;
+    setPicked(label);
+    if (answer) record(label, label === answer);
+  }
+
+  return (
+    <div className="space-y-3">
+      <QuestionCard number={n} eyebrow={m.concept ? `Your logged question · ${m.concept}` : "Your logged question"} stem={m.question} choices={choices}
+        choiceState={(l) => {
+          if (l === picked) return result === "right" ? "correct" : result === "wrong" ? "incorrect" : "selected";
+          if (result && answer && l === answer) return "correct";
+          return "default";
+        }}
+        onSelect={result ? undefined : choose} />
+      {picked && !result && !answer && (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-card p-3">
+          <span className="mr-auto text-sm">You chose <b>{picked}</b>. No answer key saved — self-check:</span>
+          <Button size="sm" variant="outline" onClick={() => record(picked, true)}>I got it right</Button>
+          <Button size="sm" onClick={() => record(picked, false)}>I got it wrong</Button>
+        </div>
+      )}
+      <div className="flex flex-wrap items-center gap-3 text-sm">
+        {result && <span className="mr-auto font-semibold">{result === "right" ? "Correct — nice work." : `Not quite${answer ? ` — answer is ${answer}` : ""}.`}</span>}
+        <Link to="/mistakes/$id" params={{ id: m.id }} className="font-bold text-primary underline">Open in mistake bank</Link>
+        {result && <Button size="sm" variant="ghost" onClick={() => { setPicked(null); setResult(null); }}>Try again</Button>}
+      </div>
     </div>
   );
 }
