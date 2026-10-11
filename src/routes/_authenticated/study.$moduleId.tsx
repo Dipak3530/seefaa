@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Bar, NativeSelect, Panel } from "@/components/seefaa/bits";
 import { Button } from "@/components/ui/button";
 import { useAttempt, useCurriculum, useInvalidate, useProfile, useProgress } from "@/hooks/use-seefaa";
-import { moduleNumber, sectionsForLos, useSubjectContent, type ContentSection } from "@/lib/study-content";
+import { moduleNumber, sectionsForLos, tagSections, useSubjectContent, type ContentSection } from "@/lib/study-content";
 import { REFERENCE_FORMULAS, referenceMatches } from "@/lib/formula-reference";
 import { cn } from "@/lib/utils";
 
@@ -50,7 +50,7 @@ function StudyModule() {
   const lp = (id: string) => prog.los.find((x) => x.los_id === id);
   const doneCount = los.filter((l) => lp(l.id)?.status === "completed").length;
   const mp = prog.modules.find((m) => m.module_id === moduleId);
-  const sections = mc ? sectionsForLos(mc.sections, losFilter) : [];
+  const sections = mc ? sectionsForLos(tagSections(mc), losFilter) : [];
   const refs = REFERENCE_FORMULAS.filter((f) => referenceMatches(f, subject.name, ""));
   const mistakes = (linked?.mistakes ?? []).filter((m) => losFilter == null || m.los_id === los[losFilter - 1]?.id);
 

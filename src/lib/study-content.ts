@@ -25,6 +25,19 @@ export function useSubjectContent(subjectId: string | undefined) {
   });
 }
 
+/** Lessons open by quoting the LOS they cover; prefer that over margin numbers, carrying tags into sub-sections. */
+export function tagSections(mc: ModuleContent): ContentSection[] {
+  const key = (t: string) => t.toLowerCase().replace(/[^a-z]/g, "").slice(0, 50);
+  const keys = mc.los.map(key);
+  let last: number[] = [];
+  return mc.sections.map((s) => {
+    const quoted = s.blocks.slice(0, 4).flatMap((b) => keys.map((k, i) => (k && key(b.x).startsWith(k) ? i + 1 : 0))).filter(Boolean);
+    const tags = quoted.length ? [...new Set(quoted)] : s.los.length ? s.los : /overview|practice|solution|summary/i.test(s.title) ? [] : last;
+    if (quoted.length || s.los.length) last = tags;
+    return { ...s, los: tags };
+  });
+}
+
 /** Sections that teach a given LOS number; untagged sections (overview, practice) appear only under "All". */
 export function sectionsForLos(sections: ContentSection[], los: number | null) {
   if (los == null) return sections;
