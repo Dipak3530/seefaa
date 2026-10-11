@@ -168,6 +168,12 @@ function Lesson({ s, moduleTitle, subjectId, moduleId, open, onToggle }: { s: Co
       </button>
       {open && (items.length > 0 ? (
         <ol className="space-y-6 border-t px-4 py-4 md:px-6">
+          {items[0]?.vignette && (
+            <li className="rounded-lg border bg-accent/40 p-4">
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">Scenario · questions {items[0].n}–{items[items.length - 1].n}</p>
+              <QuestionText text={items[0].vignette} />
+            </li>
+          )}
           {items.map((q) => (
             <li key={q.n}>
               {isSolutions || q.choices.length === 0
