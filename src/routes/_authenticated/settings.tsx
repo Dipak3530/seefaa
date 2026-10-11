@@ -106,7 +106,7 @@ function Settings() {
     const { data: imgs } = await supabase.from("mistakes").select("image_paths");
     const paths = (imgs ?? []).flatMap((m) => m.image_paths);
     if (paths.length) await supabase.storage.from("mistake-images").remove(paths);
-    for (const t of ["timer_sessions", "formulas", "mock_exams", "practice_sessions", "ai_explanations", "mistake_attempts", "mistakes", "ai_usage"] as const) await supabase.from(t).delete().eq("user_id", profile!.id);
+    for (const t of ["timer_sessions", "formulas", "mock_exams", "practice_sessions", "ai_explanations", "mistake_attempts", "mistakes", "ai_usage", "user_ai_keys"] as const) await supabase.from(t).delete().eq("user_id", profile!.id);
     await supabase.from("profiles").update({ active_attempt_id: null, onboarded: false }).eq("id", profile!.id);
     await supabase.from("exam_attempts").delete().eq("user_id", profile!.id);
     await qc.cancelQueries(); qc.clear();
