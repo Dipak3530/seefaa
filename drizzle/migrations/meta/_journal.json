@@ -29,6 +29,13 @@
       "when": 1791680542773,
       "tag": "0003_seed_2027_los_and_content_bucket",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791684601871,
+      "tag": "0004_restrict_reference_table_reads_to_authenticated",
+      "breakpoints": true
     }
   ]
 }
