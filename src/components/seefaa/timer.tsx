@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { activeSeconds, fmtHMS } from "@/lib/cfa";
 import { useAttempt, useCurriculum, useInvalidate } from "@/hooks/use-seefaa";
 import { NativeSelect } from "./bits";
+import { SuggestedRevision } from "./suggested-revision";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -81,6 +82,7 @@ export function TimerStartButtons() {
           <RotateCcw className="h-4 w-4" /> Revision Timer
         </Button>
       </div>
+      <SuggestedRevision onPick={(s, m) => { setSubject(s); setModule(m); }} />
     </div>
   );
 }
