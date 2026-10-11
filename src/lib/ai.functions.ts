@@ -2,67 +2,153 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-const MODEL = "openai/gpt-6-astra";
-const DAILY_LIMIT = 40;
-
 class AiError extends Error {
   constructor(message: string, public status = 500) {
     super(message);
   }
 }
 
-/** Streams a Responses call and returns the final text. */
-async function callResponses(body: Record<string, unknown>) {
-  const key = process.env["LOVABLE_API_KEY"];
-  if (!key) throw new AiError("AI is not configured.", 500);
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+type Provider = "openai" | "anthropic" | "gemini";
+type AiKey = { provider: Provider; api_key: string };
+
+const PROVIDER_MODELS: Record<Provider, string> = {
+  openai: "gpt-4o-mini",
+  anthropic: "claude-haiku-4-5",
+  gemini: "gemini-2.5-flash",
+};
+
+async function getUserKey(supabase: any, userId: string): Promise<AiKey> {
+  const { data } = await supabase.from("user_ai_keys").select("provider, api_key").eq("user_id", userId).maybeSingle();
+  if (!data) throw new AiError("No AI key connected yet. Add your own OpenAI, Anthropic or Gemini key in Settings → AI key to use AI explanations.", 400);
+  return data as AiKey;
+}
+
+function parseDataUrl(url: string): { mime: string; base64: string } {
+  const m = /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/.exec(url);
+  if (!m) throw new AiError("Unsupported image format.", 400);
+  return { mime: m[1], base64: m[2] };
+}
+
+type AiRequest = { instructions: string; text: string; images?: string[]; jsonSchema?: { name: string; schema: Record<string, unknown> } };
+
+async function callOpenAI(key: string, req: AiRequest): Promise<string> {
+  const content: unknown[] = [{ type: "text", text: req.text }];
+  for (const img of req.images ?? []) content.push({ type: "image_url", image_url: { url: img } });
+  const body: Record<string, unknown> = {
+    model: PROVIDER_MODELS.openai,
+    messages: [
+      { role: "system", content: req.instructions },
+      { role: "user", content },
+    ],
+  };
+  if (req.jsonSchema) body.response_format = { type: "json_schema", json_schema: { name: req.jsonSchema.name, strict: true, schema: req.jsonSchema.schema } };
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "fetch" },
-    body: JSON.stringify({ model: MODEL, stream: true, store: false, reasoning: { effort: "low" }, ...body }),
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify(body),
   });
-  if (!res.ok || !res.body) {
-    let msg = "The AI service is unavailable right now. Your data is saved — try again later.";
-    try {
-      const j = (await res.json()) as { message?: string; error?: { message?: string } };
-      if (res.status === 402 || res.status === 403 || res.status === 429) msg = j.message ?? j.error?.message ?? msg;
-    } catch {
-      /* ignore */
-    }
-    throw new AiError(msg, res.status);
-  }
-  const reader = res.body.getReader();
-  const dec = new TextDecoder();
-  let buf = "";
-  let text = "";
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buf += dec.decode(value, { stream: true });
-    const lines = buf.split("\n");
-    buf = lines.pop() ?? "";
-    for (const line of lines) {
-      if (!line.startsWith("data:")) continue;
-      const payload = line.slice(5).trim();
-      if (!payload || payload === "[DONE]") continue;
-      try {
-        const ev = JSON.parse(payload) as { type?: string; delta?: string; response?: { error?: { message?: string } } };
-        if (ev.type === "response.output_text.delta" && ev.delta) text += ev.delta;
-        if (ev.type === "response.failed") throw new AiError(ev.response?.error?.message ?? "AI request failed.");
-      } catch (e) {
-        if (e instanceof AiError) throw e;
-      }
-    }
-  }
+  if (!res.ok) throw await providerError(res, "OpenAI");
+  const j = (await res.json()) as any;
+  const text = j.choices?.[0]?.message?.content ?? "";
   if (!text.trim()) throw new AiError("The AI returned no answer. Please try again.");
   return text;
 }
 
-async function checkQuota(supabase: any, userId: string, kind: string) {
-  const since = new Date(Date.now() - 86400000).toISOString();
-  const { count } = await supabase.from("ai_usage").select("id", { count: "exact", head: true }).gte("created_at", since);
-  if ((count ?? 0) >= DAILY_LIMIT) throw new AiError(`Daily AI limit of ${DAILY_LIMIT} requests reached. It resets within 24 hours.`, 429);
-  await supabase.from("ai_usage").insert({ user_id: userId, kind });
+async function callAnthropic(key: string, req: AiRequest): Promise<string> {
+  const content: unknown[] = [];
+  for (const img of req.images ?? []) {
+    const { mime, base64 } = parseDataUrl(img);
+    content.push({ type: "image", source: { type: "base64", media_type: mime, data: base64 } });
+  }
+  let text = req.text;
+  if (req.jsonSchema) text += `\n\nRespond with ONLY valid JSON matching this schema (no markdown fences):\n${JSON.stringify(req.jsonSchema.schema)}`;
+  content.push({ type: "text", text });
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" },
+    body: JSON.stringify({ model: PROVIDER_MODELS.anthropic, max_tokens: 4096, system: req.instructions, messages: [{ role: "user", content }] }),
+  });
+  if (!res.ok) throw await providerError(res, "Anthropic");
+  const j = (await res.json()) as any;
+  const out = (j.content ?? []).filter((b: any) => b.type === "text").map((b: any) => b.text).join("");
+  if (!out.trim()) throw new AiError("The AI returned no answer. Please try again.");
+  return out;
 }
+
+async function callGemini(key: string, req: AiRequest): Promise<string> {
+  const parts: unknown[] = [{ text: req.text }];
+  for (const img of req.images ?? []) {
+    const { mime, base64 } = parseDataUrl(img);
+    parts.push({ inlineData: { mimeType: mime, data: base64 } });
+  }
+  const body: Record<string, unknown> = {
+    systemInstruction: { parts: [{ text: req.instructions }] },
+    contents: [{ role: "user", parts }],
+  };
+  if (req.jsonSchema) body.generationConfig = { responseMimeType: "application/json", responseSchema: geminiSchema(req.jsonSchema.schema) };
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${PROVIDER_MODELS.gemini}:generateContent?key=${encodeURIComponent(key)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw await providerError(res, "Gemini");
+  const j = (await res.json()) as any;
+  const text = (j.candidates?.[0]?.content?.parts ?? []).map((p: any) => p.text ?? "").join("");
+  if (!text.trim()) throw new AiError("The AI returned no answer. Please try again.");
+  return text;
+}
+
+/** Convert a JSON schema to Gemini's subset (no unions/nullable, no additionalProperties). */
+function geminiSchema(s: any): any {
+  if (Array.isArray(s?.type)) {
+    const t = s.type.filter((x: string) => x !== "null")[0];
+    return { ...geminiSchema({ ...s, type: t }), nullable: true };
+  }
+  const out: any = {};
+  if (s?.type) out.type = String(s.type).toUpperCase();
+  if (s?.description) out.description = s.description;
+  if (s?.enum) out.enum = s.enum.filter((x: unknown) => x !== null);
+  if (s?.properties) {
+    out.properties = Object.fromEntries(Object.entries(s.properties).map(([k, v]) => [k, geminiSchema(v)]));
+    if (s.required) out.required = s.required;
+  }
+  if (s?.items) out.items = geminiSchema(s.items);
+  return out;
+}
+
+async function providerError(res: Response, name: string): Promise<AiError> {
+  let msg = `${name} returned an error (${res.status}).`;
+  try {
+    const j = (await res.json()) as any;
+    msg = j?.error?.message ?? j?.message ?? msg;
+  } catch {
+    /* ignore */
+  }
+  if (res.status === 401 || res.status === 403) msg = `Your ${name} key was rejected. Check it in Settings → AI key.`;
+  if (res.status === 429) msg = `${name} rate limit reached on your key. Wait a moment and try again.`;
+  return new AiError(msg, res.status);
+}
+
+async function callUserAi(key: AiKey, req: AiRequest): Promise<string> {
+  if (key.provider === "openai") return callOpenAI(key.api_key, req);
+  if (key.provider === "anthropic") return callAnthropic(key.api_key, req);
+  return callGemini(key.api_key, req);
+}
+
+/** Validates a key with a tiny live call, then saves it (one key per user). */
+export const saveAiKey = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ provider: z.enum(["openai", "anthropic", "gemini"]), apiKey: z.string().min(10).max(300) }).parse(d))
+  .handler(async ({ data, context }) => {
+    try {
+      await callUserAi({ provider: data.provider, api_key: data.apiKey }, { instructions: "You are a health check.", text: "Reply with the single word: ok" });
+    } catch (e) {
+      return { ok: false as const, error: e instanceof Error ? e.message : "The key could not be verified." };
+    }
+    const { error } = await context.supabase.from("user_ai_keys").upsert({ user_id: context.userId, provider: data.provider, api_key: data.apiKey, updated_at: new Date().toISOString() });
+    if (error) return { ok: false as const, error: error.message };
+    return { ok: true as const };
+  });
 
 const SUBJECT_IDS = ["quant", "econ", "fsa", "corp", "equity", "fi", "deriv", "pm", "alts", "ethics"];
 
@@ -91,6 +177,19 @@ const extractSchema = {
   },
 };
 
+function parseJson(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    const m = /```(?:json)?\s*([\s\S]*?)```/.exec(text);
+    if (m) return JSON.parse(m[1]);
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}");
+    if (start >= 0 && end > start) return JSON.parse(text.slice(start, end + 1));
+    throw new AiError("The AI response could not be read. Please try again.");
+  }
+}
+
 export const extractQuestion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
@@ -100,22 +199,15 @@ export const extractQuestion = createServerFn({ method: "POST" })
     const total = data.images.reduce((a, s) => a + s.length, 0);
     if (total > 9_000_000) return { ok: false as const, error: "Images are too large. Try fewer or smaller screenshots." };
     try {
-      await checkQuota(context.supabase, context.userId, "extract");
-      const text = await callResponses({
+      const key = await getUserKey(context.supabase, context.userId);
+      const text = await callUserAi(key, {
         instructions:
           "You extract CFA Level I practice questions from screenshots for a candidate's private mistake log. Transcribe only what is visible. NEVER invent question text, numbers, answer choices, or a correct answer. If something is cut off or unreadable, leave it null/empty and list it in issues. Only set correct_answer when the image explicitly marks or states it.",
-        input: [
-          {
-            role: "user",
-            content: [
-              { type: "input_text", text: `Extract the question. If helpful, pick the closest module title from: ${data.moduleTitles.join(" | ") || "(none)"}` },
-              ...data.images.map((url) => ({ type: "input_image", image_url: url })),
-            ],
-          },
-        ],
-        text: { format: { type: "json_schema", name: "extraction", strict: true, schema: extractSchema } },
+        text: `Extract the question. If helpful, pick the closest module title from: ${data.moduleTitles.join(" | ") || "(none)"}`,
+        images: data.images,
+        jsonSchema: { name: "extraction", schema: extractSchema },
       });
-      return { ok: true as const, result: JSON.parse(text) };
+      return { ok: true as const, result: parseJson(text) };
     } catch (e) {
       return { ok: false as const, error: e instanceof Error ? e.message : "Extraction failed." };
     }
@@ -149,7 +241,7 @@ export const explainMistake = createServerFn({ method: "POST" })
     const { data: m } = await sb.from("mistakes").select("*").eq("id", data.mistakeId).maybeSingle();
     if (!m) return { ok: false as const, error: "Mistake not found." };
     try {
-      await checkQuota(sb, context.userId, "explain");
+      const key = await getUserKey(sb, context.userId);
       const [{ data: mod }, { data: prior }] = await Promise.all([
         m.module_id ? sb.from("modules").select("title").eq("id", m.module_id).maybeSingle() : Promise.resolve({ data: null }),
         sb.from("mistakes").select("question, concept, error_category, created_at").neq("id", m.id)
@@ -163,10 +255,10 @@ Candidate selected: ${m.selected_answer ?? "unknown"}
 Correct answer: ${m.correct_answer ? `${m.correct_answer}${m.correct_verified ? " (verified by candidate)" : " (unverified)"}` : "NOT PROVIDED"}
 Candidate's error category: ${m.error_category}; notes: ${m.notes ?? "none"}
 Earlier related mistakes by this candidate (${prior?.length ?? 0}):\n${(prior ?? []).map((p: any) => `- [${p.error_category}] ${p.concept ?? ""}: ${String(p.question).slice(0, 160)}`).join("\n") || "none"}`;
-      const content = await callResponses({
+      const content = await callUserAi(key, {
         instructions:
           "You are SEEFAA's CFA Level I tutor. Be accurate and clear. Do not reproduce copyrighted CFA Institute text. If the correct answer was not provided and cannot be established with certainty from the question, say so explicitly and ask the candidate to confirm it — never present a guess as fact. If earlier related mistakes show a pattern, start with a short '⚠ Recurring weakness' note explaining it.",
-        input: [{ role: "user", content: [{ type: "input_text", text: `${MODES[data.mode]}\n\n${context_}` }] }],
+        text: `${MODES[data.mode]}\n\n${context_}`,
       });
       const { data: saved } = await sb.from("ai_explanations").insert({ user_id: context.userId, mistake_id: m.id, mode: data.mode, content }).select().single();
       return { ok: true as const, explanation: saved };
@@ -183,10 +275,10 @@ export const explainFormula = createServerFn({ method: "POST" })
     const { data: f } = await sb.from("formulas").select("*").eq("id", data.formulaId).maybeSingle();
     if (!f) return { ok: false as const, error: "Formula not found." };
     try {
-      await checkQuota(sb, context.userId, "formula");
-      const content = await callResponses({
+      const key = await getUserKey(sb, context.userId);
+      const content = await callUserAi(key, {
         instructions: "You are a CFA Level I tutor. Explain formulas clearly with an original worked example and BA II Plus keystrokes where relevant. Use markdown.",
-        input: [{ role: "user", content: [{ type: "input_text", text: `Formula: ${f.name}\nExpression: ${f.expression}\nVariables: ${f.variables ?? ""}\nExplain when to use it, an original example, calculator steps and common mistakes.` }] }],
+        text: `Formula: ${f.name}\nExpression: ${f.expression}\nVariables: ${f.variables ?? ""}\nExplain when to use it, an original example, calculator steps and common mistakes.`,
       });
       const { data: saved } = await sb.from("ai_explanations").insert({ user_id: context.userId, formula_id: f.id, mode: "formula", content }).select().single();
       return { ok: true as const, explanation: saved };
