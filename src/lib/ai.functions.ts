@@ -177,7 +177,7 @@ const extractSchema = {
   },
 };
 
-function parseJson(text: string): unknown {
+function parseJson(text: string): any {
   try {
     return JSON.parse(text);
   } catch {
