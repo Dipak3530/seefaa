@@ -2,7 +2,7 @@ import { pageMeta } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ChevronLeft } from "lucide-react";
+import { BookOpenText, ChevronLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader, Bar, NativeSelect } from "@/components/seefaa/bits";
 import { useAttempt, useCurriculum, useInvalidate, useProfile, useProgress } from "@/hooks/use-seefaa";
@@ -82,7 +82,7 @@ function SubjectPage() {
           const los = cur.los.filter((l) => l.module_id === m.id);
           return (
             <div key={m.id} className="card-soft p-4">
-              <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 sm:grid-cols-[auto_minmax(0,1fr)_auto_auto]">
+              <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 sm:grid-cols-[auto_minmax(0,1fr)_auto_auto_auto]">
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-secondary text-xs font-bold text-primary">{i + 1}</span>
                 <div className="min-w-0">
                   <p className="font-medium"><Link to="/study/$moduleId" params={{ moduleId: m.id }} className="hover:text-primary hover:underline">{m.title}</Link>{m.needs_verification && <span className="ml-2 rounded bg-sun/40 px-1.5 py-0.5 text-[10px]">needs verification</span>}</p>
