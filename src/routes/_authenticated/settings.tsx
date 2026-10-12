@@ -13,7 +13,6 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { PageHeader, Panel } from "@/components/seefaa/bits";
 import { useAttempt, useCurriculum, useInvalidate, useProfile } from "@/hooks/use-seefaa";
 import { WEEKDAYS, fmtDate, ETHICS_ID } from "@/lib/cfa";
-import { saveAiKey } from "@/lib/ai.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -36,10 +35,6 @@ function Settings() {
   const [carry, setCarry] = useState({ mistakes: true, formulas: true });
   const [examNew, setExamNew] = useState("");
   const { data: attempts, refetch } = useQuery({ queryKey: ["attempts"], queryFn: async () => (await supabase.from("exam_attempts").select("*").order("created_at")).data ?? [] });
-  const { data: aiKeyRow, refetch: refetchKey } = useQuery({ queryKey: ["ai-key"], queryFn: async () => (await supabase.from("user_ai_keys").select("provider, api_key").maybeSingle()).data });
-  const [aiProvider, setAiProvider] = useState<"openai" | "anthropic" | "gemini">("openai");
-  const [aiKey, setAiKey] = useState("");
-  const [keyBusy, setKeyBusy] = useState(false);
 
   useEffect(() => {
     if (profile) setP({ display_name: profile.display_name ?? "", hours: Number(profile.hours_per_day), days: profile.study_days, opt: profile.leaderboard_opt_in, tz: profile.timezone, rem: profile.reminders as Reminders });
@@ -74,24 +69,6 @@ function Settings() {
   async function switchAttempt(id: string) {
     await supabase.from("profiles").update({ active_attempt_id: id }).eq("id", profile!.id);
     inv("profile", "attempt", "progress");
-  }
-  async function connectKey() {
-    setKeyBusy(true);
-    try {
-      const r = await saveAiKey({ data: { provider: aiProvider, apiKey: aiKey.trim() } });
-      if (!r.ok) return toast.error(r.error);
-      setAiKey("");
-      toast.success("AI key verified and saved.");
-      refetchKey();
-    } finally {
-      setKeyBusy(false);
-    }
-  }
-  async function removeKey() {
-    const { error } = await supabase.from("user_ai_keys").delete().eq("user_id", profile!.id);
-    if (error) return toast.error(error.message);
-    toast.success("AI key removed. AI features will pause until you add a new key.");
-    refetchKey();
   }
   async function exportAll() {
     const tables = ["profiles", "exam_attempts", "subject_plans", "module_progress", "los_progress", "revision_checkpoints", "study_tasks", "mistakes", "mistake_attempts", "ai_explanations", "practice_sessions", "mock_exams", "formulas", "timer_sessions", "xp_ledger"] as const;
@@ -153,39 +130,6 @@ function Settings() {
               <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 text-sm"><span className="col-span-3 text-xs font-medium">Quiet hours</span><Input type="time" className="min-w-0 w-full" value={p.rem.quiet_start} onChange={(e) => setP({ ...p, rem: { ...p.rem, quiet_start: e.target.value } })} /> to <Input type="time" className="min-w-0 w-full" value={p.rem.quiet_end} onChange={(e) => setP({ ...p, rem: { ...p.rem, quiet_end: e.target.value } })} /></div>
             </div>
             <Button onClick={saveProfile}>Save preferences</Button>
-          </div>
-        </Panel>
-        <Panel title="AI key" className="lg:col-span-2">
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              AI explanations and screenshot extraction run on your own AI key — your usage, your bill. The key is stored securely and never displayed in full.
-            </p>
-            {aiKeyRow ? (
-              <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-accent px-3 py-2 text-sm">
-                <span>
-                  Connected: <b className="capitalize">{aiKeyRow.provider}</b> · <code>{String(aiKeyRow.api_key).slice(0, 6)}…{String(aiKeyRow.api_key).slice(-4)}</code>
-                </span>
-                <Button size="sm" variant="destructive" onClick={removeKey}>Remove key</Button>
-              </div>
-            ) : (
-              <p className="rounded-lg border border-primary/40 bg-accent px-3 py-2 text-sm">No key connected — AI explanations are paused until you add one.</p>
-            )}
-            <div className="flex flex-wrap items-end gap-2">
-              <div className="space-y-1">
-                <Label>Provider</Label>
-                <div className="flex gap-1.5">
-                  {([["openai", "OpenAI"], ["anthropic", "Anthropic"], ["gemini", "Gemini"]] as const).map(([v, l]) => (
-                    <Button key={v} size="sm" variant={aiProvider === v ? "default" : "outline"} aria-pressed={aiProvider === v} onClick={() => setAiProvider(v)}
-                      className={cn("rounded-full border px-3 py-1 text-xs", aiProvider === v ? "bg-primary text-primary-foreground" : "bg-card")}>{l}</Button>
-                  ))}
-                </div>
-              </div>
-              <div className="min-w-56 flex-1 space-y-1">
-                <Label>{aiKeyRow ? "Replace key" : "API key"}</Label>
-                <Input type="password" value={aiKey} onChange={(e) => setAiKey(e.target.value)} placeholder={aiProvider === "openai" ? "sk-..." : aiProvider === "anthropic" ? "sk-ant-..." : "AIza..."} />
-              </div>
-              <Button loading={keyBusy} disabled={aiKey.trim().length < 10} onClick={connectKey}>{keyBusy ? "Verifying…" : "Verify & save"}</Button>
-            </div>
           </div>
         </Panel>
         <Panel title="Your data" className="lg:col-span-2">
