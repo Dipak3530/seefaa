@@ -1,4 +1,5 @@
 # SEEFAA roadmap
+- [ ] Fix Alternative Investments Module 2 Question 4 and audit all subject practice sets for passage/answer-key spillover
 - [x] Remove book reading from the portal; retain subject analytics, modules, LOS titles and interactive practice
 - [x] Verify the streamlined subject-to-module practice flow; signed-in Economics answer selection and Quant navigation passed, with 15 tests and no browser errors
 - [x] Polish existing saved question with a clear concept heading, highlighted prompt, structured data and explicit answer summaries; verified desktop/mobile and retry selection without editing saved data
