@@ -64,17 +64,17 @@ export type PracticeQuestion = { n: number; stem: string; choices: { label: stri
  * Presentation only — never invents or alters content.
  */
 export function parsePracticeItems(blocks: ContentBlock[], noise: string[] = []): PracticeQuestion[] {
-  let text = blocks.map((b) => b.t === "table" ? formatSourceTable(b.x, noise) : b.x).join("\n\n").replace(/­/g, "").trim();
+  let text = blocks.map((b) => b.t === "table" ? formatSourceTable(b.x, noise) : b.x.replace(/^\s*[•●]\s*/, "- ")).join("\n\n").replace(/­/g, "").trim();
   for (const n of noise) if (n) text = text.split(n).join(" ");
   // A heading belongs to the answer-key run, never to the final answer choice.
   text = text.replace(/(?:^|\n)\s*Solutions?\s*(?=\n|$)/gi, "\n\n");
   const tabbed = splitNumbered(text, /(\d{1,2})\.\t/, /([A-F])\.\t/);
-  return separateScenarios(mergeSolutions(tabbed.length >= 2 ? tabbed : splitProse(text)));
+  return separateScenarios(mergeSolutions(/^1\.\t/.test(text) && tabbed.length ? tabbed : splitProse(text)));
 }
 
 /** Keep source line breaks and values, including empty cells; never supply missing figures. */
 function formatSourceTable(text: string, noise: string[]): string {
-  let rows = text.split("\n").filter(line => !noise.some(n => n && line.trim().startsWith(`${n} |`)));
+  let rows = text.split("\n").filter(line => !/^Solutions?\s*\|\s*\d+\s*$/i.test(line) && !noise.some(n => n && line.trim().startsWith(`${n} |`)));
   // This source exhibit repeats a wrapped header at a page break. Investment dates
   // are explicitly stated in the question; blank cells remain blank, not guessed.
   if (text.includes("Investor A’s | Investor B’s | Investor C’s") && text.includes("Annual Gross | Investment")) {
@@ -84,6 +84,11 @@ function formatSourceTable(text: string, noise: string[]): string {
       if (cells[0] === "3" && cells.length === 4 && cells[3] === "100") cells.splice(3, 0, "");
       return cells.join(" | ");
     })];
+  }
+  if (rows[0]?.startsWith("Gross | Investor") && rows[1]?.startsWith("Year | Return | Investment")) {
+    const first = rows[0].split("|").map(c => c.trim());
+    const second = rows[1].split("|").map(c => c.trim());
+    rows = [[second[0], `Annual ${first[0]} ${second[1]}`, `${first[1]} ${second[2]}`, ...first.slice(2).map((label, i) => `${label} ${second[i + 3]}`)].join(" | "), ...rows.slice(2)];
   }
   const cells = rows.map(line => line.split("|").map(c => c.trim()));
   if (!cells.length) return "";
@@ -95,16 +100,16 @@ function formatSourceTable(text: string, noise: string[]): string {
 /** A shared scenario starts after the previous choice and belongs to its stated question range. */
 function separateScenarios(items: PracticeQuestion[]): PracticeQuestion[] {
   const scenarios: { from: number; to: number; text: string }[] = [];
-  const marker = /The following (?:information|exhibit|data) (?:relates|applies) to questions?\s+(\d+)\s*[-–−]\s*(\d+)/i;
+  const marker = /The following (?:information|exhibit|data) (?:relates|applies) to questions?\s+(\d+)(?:\s*[-–−]\s*(\d+))?/i;
   for (const q of items) {
     if (q.vignette) {
       const match = q.vignette.match(marker);
-      if (match) scenarios.push({ from: Number(match[1]), to: Number(match[2]), text: q.vignette });
+      if (match) scenarios.push({ from: Number(match[1]), to: Number(match[2] ?? match[1]), text: q.vignette });
     }
     for (const choice of q.choices) {
       const match = marker.exec(choice.text);
       if (!match) continue;
-      scenarios.push({ from: Number(match[1]), to: Number(match[2]), text: choice.text.slice(match.index).trim() });
+      scenarios.push({ from: Number(match[1]), to: Number(match[2] ?? match[1]), text: choice.text.slice(match.index).trim() });
       choice.text = choice.text.slice(0, match.index).trim();
     }
   }
