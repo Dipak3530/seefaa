@@ -64,7 +64,19 @@ export type PracticeQuestion = { n: number; stem: string; choices: { label: stri
  * Presentation only — never invents or alters content.
  */
 export function parsePracticeItems(blocks: ContentBlock[], noise: string[] = []): PracticeQuestion[] {
-  let text = blocks.map((b) => b.t === "table" ? formatSourceTable(b.x, noise) : b.x.replace(/^\s*[•●]\s*/, "- ")).join("\n\n").replace(/­/g, "").trim();
+  const prepared: ContentBlock[] = [];
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+    // Rejoin a header and its body split by a repeated page-margin label.
+    if (block.t === "table" && block.x.startsWith("Gross | Investor") && blocks[i + 1]?.x.trim() === "(Before Fee)" && blocks[i + 2]?.t === "table") {
+      prepared.push({ t: "table", x: `${block.x}\n${blocks[i + 2].x}` });
+      i += 2;
+    } else if (block.t === "table" && block.x === "Year | Amount ($ m) | Profit" && blocks[i + 1]?.x.trim() === "Investment" && blocks[i + 2]?.t === "table") {
+      prepared.push({ t: "table", x: blocks[i + 2].x });
+      i += 2;
+    } else prepared.push(block);
+  }
+  let text = prepared.map((b) => b.t === "table" ? formatSourceTable(b.x, noise) : b.x.replace(/^\s*[•●]\s*/, "- ")).join("\n\n").replace(/­/g, "").trim();
   for (const n of noise) if (n) text = text.split(n).join(" ");
   // A heading belongs to the answer-key run, never to the final answer choice.
   text = text.replace(/(?:^|\n)\s*Solutions?\s*(?=\n|$)/gi, "\n\n");
@@ -94,7 +106,8 @@ function formatSourceTable(text: string, noise: string[]): string {
   if (!cells.length) return "";
   const width = Math.max(...cells.map(row => row.length));
   const render = (row: string[]) => `| ${Array.from({ length: width }, (_, i) => row[i] ?? "").join(" | ")} |`;
-  return [render(cells[0]), render(Array(width).fill("---")), ...cells.slice(1).map(render)].join("\n");
+  const summaries = cells.filter(row => /^Investor [ABC]['’]s net return$/i.test(row[0]));
+  return [render(cells[0]), render(Array(width).fill("---")), ...cells.slice(1).filter(row => !summaries.includes(row)).map(render), ...summaries.map(row => `\n**${row[0]}: ${row[1]}**`)].join("\n");
 }
 
 /** A shared scenario starts after the previous choice and belongs to its stated question range. */
