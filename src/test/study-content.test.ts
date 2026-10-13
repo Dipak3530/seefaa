@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { tagSections, sectionsForLos, parsePracticeItems, practiceOnlyModules } from "@/lib/study-content";
+import { tagSections, sectionsForLos, parsePracticeItems, practiceOnlyModules, solutionLetter, type ContentBlock } from "@/lib/study-content";
+import altsBlocks from "./fixtures/alts-module-2-practice.json";
 
 const mc = { num: 1, los: ["determine and interpret breakeven points", "describe market structures"], sections: [
   { title: "Overview", los: [], blocks: [{ t: "p" as const, x: "intro" }] },
@@ -39,6 +40,36 @@ describe("practice-only portal", () => {
 });
 
 describe("practice problem parsing", () => {
+  it("keeps Alternative Investments module 2 question 5 out of question 4 option C", () => {
+    const items = parsePracticeItems(altsBlocks as ContentBlock[], ["Practice Problems"]);
+    const fourth = items.find(q => q.n === 4);
+    expect(items.map(q => q.n)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    expect(fourth?.choices).toEqual([{ label: "A", text: "Investor A" }, { label: "B", text: "Investor B" }, { label: "C", text: "Investor C" }]);
+    expect(items.find(q => q.n === 5)?.vignette).toContain("Buyout Capital, LLC");
+    expect(items.find(q => q.n === 6)?.vignette).toContain("Buyout Capital, LLC");
+    expect(items.find(q => q.n === 5)?.stem).toBe("What is the total carried interest to the GP?");
+  });
+  it("preserves question 4 investment values and separates its verified C solution", () => {
+    const q = parsePracticeItems(altsBlocks as ContentBlock[], ["Practice Problems"]).find(q => q.n === 4);
+    expect(q?.stem).toContain("| 2 | –15% | — | 100 | — |");
+    expect(q?.stem).toContain("| 3 | 15% | — |  | 100 |");
+    expect(q?.stem).not.toContain("59");
+    expect(q && solutionLetter(q)).toBe("C");
+    expect(q?.solution).toContain("Investor A's net return");
+    expect(q?.solution).toContain("15.18%");
+    expect(q?.solution).toContain("| Year | Annual Gross Return | Investor A’s Investment |");
+    expect(q?.choices[2].text).not.toContain("is correct");
+  });
+  it("moves a single-question scenario out of the previous option", () => {
+    const items = parsePracticeItems([{ t: "p", x: "1. First? A. One B. Two C. Three The following information relates to question 2 Source scenario. 2. Second? A. Four B. Five C. Six" }]);
+    expect(items[0].choices[2].text).toBe("Three");
+    expect(items[1].vignette).toBe("The following information relates to question 2 Source scenario.");
+  });
+  it("does not treat a tabbed table value as a tabbed question layout", () => {
+    const items = parsePracticeItems([{ t: "p", x: "1. First? A. One B. Two C. Three 2. Second? A. Four B. Five C. Six 3. Third? A. Seven B. Eight C. Nine 4. Fourth? A. Ten B. Eleven C. Twelve 5. Match values: 1.\t 10 2.\t 20" }]);
+    expect(items.map(q => q.n)).toEqual([1, 2, 3, 4, 5]);
+    expect(items[3].choices[2].text).toBe("Twelve");
+  });
   const blocks = [{ t: "p" as const, x: "1.\t An investor purchased 100 shares for NOK34.50. The holding period return is closest to: A.\t −13.08%. B.\t −11.59%. C.\t −10.10%. 2.\t An analyst obtains returns: Year 1 14.0 Year 2 −10.0. The return is closest to: Returns of Financial Assets and Instruments A.\t 0.18%. B.\t 0.55%. C.\t 1.65%." }];
   it("splits run-on text into numbered questions", () => {
     const items = parsePracticeItems(blocks, ["Practice Problems", "Returns of Financial Assets and Instruments"]);
