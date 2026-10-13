@@ -64,11 +64,55 @@ export type PracticeQuestion = { n: number; stem: string; choices: { label: stri
  * Presentation only — never invents or alters content.
  */
 export function parsePracticeItems(blocks: ContentBlock[], noise: string[] = []): PracticeQuestion[] {
-  let text = blocks.map((b) => b.x).join(" ").replace(/­/g, "").trim();
+  let text = blocks.map((b) => b.t === "table" ? formatSourceTable(b.x, noise) : b.x).join("\n\n").replace(/­/g, "").trim();
   for (const n of noise) if (n) text = text.split(n).join(" ");
+  // A heading belongs to the answer-key run, never to the final answer choice.
+  text = text.replace(/(?:^|\n)\s*Solutions?\s*(?=\n|$)/gi, "\n\n");
   const tabbed = splitNumbered(text, /(\d{1,2})\.\t/, /([A-F])\.\t/);
-  if (tabbed.length >= 2) return mergeSolutions(tabbed);
-  return mergeSolutions(splitProse(text));
+  return separateScenarios(mergeSolutions(tabbed.length >= 2 ? tabbed : splitProse(text)));
+}
+
+/** Keep source line breaks and values, including empty cells; never supply missing figures. */
+function formatSourceTable(text: string, noise: string[]): string {
+  let rows = text.split("\n").filter(line => !noise.some(n => n && line.trim().startsWith(`${n} |`)));
+  // This source exhibit repeats a wrapped header at a page break. Investment dates
+  // are explicitly stated in the question; blank cells remain blank, not guessed.
+  if (text.includes("Investor A’s | Investor B’s | Investor C’s") && text.includes("Annual Gross | Investment")) {
+    const data = rows.filter(line => /^\d+\s*\|/.test(line));
+    rows = ["Year | Annual gross return | Investor A (€ millions) | Investor B (€ millions) | Investor C (€ millions)", ...data.map(line => {
+      const cells = line.split("|").map(c => c.trim());
+      if (cells[0] === "3" && cells.length === 4 && cells[3] === "100") cells.splice(3, 0, "");
+      return cells.join(" | ");
+    })];
+  }
+  const cells = rows.map(line => line.split("|").map(c => c.trim()));
+  if (!cells.length) return "";
+  const width = Math.max(...cells.map(row => row.length));
+  const render = (row: string[]) => `| ${Array.from({ length: width }, (_, i) => row[i] ?? "").join(" | ")} |`;
+  return [render(cells[0]), render(Array(width).fill("---")), ...cells.slice(1).map(render)].join("\n");
+}
+
+/** A shared scenario starts after the previous choice and belongs to its stated question range. */
+function separateScenarios(items: PracticeQuestion[]): PracticeQuestion[] {
+  const scenarios: { from: number; to: number; text: string }[] = [];
+  const marker = /The following (?:information|exhibit|data) (?:relates|applies) to questions?\s+(\d+)\s*[-–−]\s*(\d+)/i;
+  for (const q of items) {
+    if (q.vignette) {
+      const match = q.vignette.match(marker);
+      if (match) scenarios.push({ from: Number(match[1]), to: Number(match[2]), text: q.vignette });
+    }
+    for (const choice of q.choices) {
+      const match = marker.exec(choice.text);
+      if (!match) continue;
+      scenarios.push({ from: Number(match[1]), to: Number(match[2]), text: choice.text.slice(match.index).trim() });
+      choice.text = choice.text.slice(0, match.index).trim();
+    }
+  }
+  for (const q of items) {
+    const scenario = scenarios.find(s => q.n >= s.from && q.n <= s.to);
+    if (scenario) q.vignette = scenario.text;
+  }
+  return items;
 }
 
 const SOLUTION_PHRASING = /^([A-F])\s+is correct|^The correct (?:response|answer) is/i;
@@ -118,10 +162,10 @@ function splitNumbered(text: string, numRe: RegExp, choiceRe: RegExp): PracticeQ
 
 function splitChoices(body: string, choiceRe: RegExp): { stem: string; choices: { label: string; text: string }[] } {
   const segs = body.split(choiceRe);
-  const stem = segs[0].replace(/\s+/g, " ").trim();
+  const stem = segs[0].trim();
   const choices: { label: string; text: string }[] = [];
   for (let j = 1; j + 1 < segs.length; j += 2) {
-    const ct = segs[j + 1].replace(/\s+/g, " ").trim();
+    const ct = segs[j + 1].trim();
     if (ct) choices.push({ label: segs[j], text: ct });
   }
   return { stem, choices };
@@ -144,7 +188,7 @@ function splitProse(text: string): PracticeQuestion[] {
     expected++;
   }
   if (!starts.length) return [];
-  const vignette = text.slice(0, starts[0].from).replace(/\s+/g, " ").trim();
+  const vignette = text.slice(0, starts[0].from).trim();
   return starts.map((s, i) => {
     const body = text.slice(s.to, i + 1 < starts.length ? starts[i + 1].from : undefined);
     const item: PracticeQuestion = { n: s.n, ...splitChoicesProse(body) };
@@ -164,11 +208,11 @@ function splitChoicesProse(body: string): { stem: string; choices: { label: stri
     starts.push({ label: m[1], from: m.index + m[0].indexOf(m[1]), to: m.index + m[0].length });
     expected++;
   }
-  if (!starts.length) return { stem: body.replace(/\s+/g, " ").trim(), choices: [] };
-  const stem = body.slice(0, starts[0].from).replace(/\s+/g, " ").trim();
+  if (!starts.length) return { stem: body.trim(), choices: [] };
+  const stem = body.slice(0, starts[0].from).trim();
   const choices = starts.map((s, i) => ({
     label: s.label,
-    text: body.slice(s.to, i + 1 < starts.length ? starts[i + 1].from : undefined).replace(/\s+/g, " ").trim(),
+    text: body.slice(s.to, i + 1 < starts.length ? starts[i + 1].from : undefined).trim(),
   })).filter((c) => c.text);
   return { stem, choices };
 }
