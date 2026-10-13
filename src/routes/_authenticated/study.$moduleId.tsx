@@ -35,7 +35,7 @@ function ModulePractice({ moduleId }: { moduleId: string }) {
   const [practicing, setPracticing] = useState(false);
   const mc = content?.find(c => c.num === moduleNumber(moduleId));
   const sets = useMemo(() => mc?.sections.filter(s => /practice problems?/i.test(s.title)).map(s => ({
-    title: s.title, items: parsePracticeItems(s.blocks, [s.title, mod?.title ?? ""]),
+    title: s.title, items: parsePracticeItems([...s.blocks, ...mc.sections.filter(section => /^solutions?$/i.test(section.title.trim())).flatMap(section => section.blocks)], [s.title, mod?.title ?? ""]),
   })) ?? [], [mc, mod?.title]);
   const questionCount = sets.reduce((sum, set) => sum + set.items.length, 0);
   const { data: logged } = useQuery({
@@ -110,7 +110,6 @@ function ModulePractice({ moduleId }: { moduleId: string }) {
           {questionCount > 0 && <p className="inline-block rounded-full border-2 border-foreground bg-primary px-3 py-1 text-xs font-bold uppercase text-primary-foreground">Website questions · {questionCount}</p>}
           {sets.map((set, i) => <div key={i}>
           <ol className="space-y-6">
-            {set.items[0]?.vignette && <li className="rounded-lg border bg-accent/40 p-4"><p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Scenario</p><QuestionText text={set.items[0].vignette} /></li>}
             {set.items.map(q => <li key={q.n}>{q.choices.length ? <PortalQuestion q={q} subjectId={mod.subject_id} moduleId={moduleId} /> : <QuestionCard number={q.n} eyebrow="Website question" stem={q.stem} choices={q.choices} />}</li>)}
           </ol>
         </div>)}</div>}
@@ -172,6 +171,7 @@ function PortalQuestion({ q, subjectId, moduleId }: { q: PracticeQuestion; subje
 
   return (
     <div className="space-y-3">
+      {q.vignette && <div className="rounded-lg border bg-accent/40 p-4"><p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Scenario</p><QuestionText text={q.vignette} /></div>}
       <QuestionCard number={q.n} eyebrow="Practice question" stem={q.stem} choices={q.choices}
         choiceState={(l) => {
           if (l === picked) return result === "right" ? "correct" : result === "logged" ? "incorrect" : "selected";

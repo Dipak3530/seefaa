@@ -1,0 +1,346 @@
+[
+  {
+    "t": "p",
+    "x": "1. The following information applies to Rotunda Advisers, a hedge fund:"
+  },
+  {
+    "t": "p",
+    "x": "• $288 million in AUM as of prior year end"
+  },
+  {
+    "t": "p",
+    "x": "• 2% management fee (based on year-end AUM)"
+  },
+  {
+    "t": "p",
+    "x": "• 20% incentive fee calculated:"
+  },
+  {
+    "t": "table",
+    "x": "● | Net of management fee\n● | Using a 5% soft hurdle rate\n● | Using a high-water mark (high-water mark is $357 million)"
+  },
+  {
+    "t": "p",
+    "x": "• Current-year fund gross return is 25%. The total fee earned by Rotunda in the current year is closest to: A. $7.20 million."
+  },
+  {
+    "t": "p",
+    "x": "B. $20.16 million."
+  },
+  {
+    "t": "p",
+    "x": "C. $21.60 million."
+  },
+  {
+    "t": "p",
+    "x": "2. A hedge fund with net capital of GBP500 million has borrowed an additional GBP200 million at 4.5% per annum. The current-year return of the fund is 15%. What would have been the return if the fund had not added any leverage? A. 10.7%"
+  },
+  {
+    "t": "p",
+    "x": "B. 12.0%"
+  },
+  {
+    "t": "p",
+    "x": "C. 19.2%"
+  },
+  {
+    "t": "p",
+    "x": "3. A common problem for the “mark-to-model” valuation of private equity funds is most likely: A. a violation of accounting rules."
+  },
+  {
+    "t": "p",
+    "x": "B. an understatement of portfolio risk."
+  },
+  {
+    "t": "p",
+    "x": "C. an understatement of interim portfolio return."
+  },
+  {
+    "t": "p",
+    "x": "4. A commodity hedge fund has three investors:"
+  },
+  {
+    "t": "p",
+    "x": "• €100 million from Investor A invested at Year 0,"
+  },
+  {
+    "t": "p",
+    "x": "• €100 million from Investor B invested at the beginning of Year 2, and"
+  },
+  {
+    "t": "p",
+    "x": "• €100 million from Investor C invested at the beginning of Year 3. The gross returns before fees of the fund are as follows:"
+  },
+  {
+    "t": "table",
+    "x": "Investor A’s | Investor B’s | Investor C’s\nAnnual Gross | Investment | Investment | Investment\nYear | Return | (€ millions) | (€ millions) | (€ millions)\n0 | — | 100 | —\n1 | 20% | — | —\n2 | –15% | — | 100 | —\nPractice Problems | 59\nInvestor A’s | Investor B’s | Investor C’s\nAnnual Gross | Investment | Investment | Investment\nYear | Return | (€ millions) | (€ millions) | (€ millions)\n3 | 15% | — | 100\n4 | 10% | — | —"
+  },
+  {
+    "t": "p",
+    "x": "The management fee is 2% based on end-of-year value. The incentive fee is 20% above the high-water mark and is calculated based on end-of-year value net of management fee. Which investor has earned the highest net return after the end of Year 4? A. Investor A"
+  },
+  {
+    "t": "p",
+    "x": "B. Investor B"
+  },
+  {
+    "t": "p",
+    "x": "C. Investor C"
+  },
+  {
+    "t": "p",
+    "x": "The following information relates to questions 5-6 Buyout Capital, LLC, is a private equity fund that has the following characteristics:"
+  },
+  {
+    "t": "p",
+    "x": "• Capital committed: $200 million"
+  },
+  {
+    "t": "p",
+    "x": "• Preferred return: 8% soft hurdle, with full catch-up"
+  },
+  {
+    "t": "p",
+    "x": "• Fund distribution: after five years"
+  },
+  {
+    "t": "p",
+    "x": "• Management fee: none"
+  },
+  {
+    "t": "p",
+    "x": "• Carried interest: 20% above preferred return"
+  },
+  {
+    "t": "p",
+    "x": "• Waterfall structure: American (deal by deal) with clawback The fund made five investments, tabulated as follows:"
+  },
+  {
+    "t": "table",
+    "x": "Year | Amount ($ m) | Profit"
+  },
+  {
+    "t": "p",
+    "x": "Investment"
+  },
+  {
+    "t": "table",
+    "x": "No. | Invested | Sold | Invested | Sold | $m | %\n1 | 0 | 4 | 40 | 60 | 20 | 10.67%\n2 | 0 | 4 | 40 | 100 | 60 | 25.74%\n3 | 1 | 5 | 40 | 50 | 10 | 5.74%\n4 | 1 | 5 | 40 | 120 | 80 | 31.61%\n5 | 2 | 5 | 40 | 30 | (10) | neg.\nTotal | 200 | 360 | 160 | 12.47%"
+  },
+  {
+    "t": "p",
+    "x": "5. What is the total carried interest to the GP? A. $30 million"
+  },
+  {
+    "t": "p",
+    "x": "B. $32 million"
+  },
+  {
+    "t": "p",
+    "x": "C. $34 million"
+  },
+  {
+    "t": "p",
+    "x": "6. Buyout Capital, LLC, is a private equity fund that has the following"
+  },
+  {
+    "t": "p",
+    "x": "characteristics:"
+  },
+  {
+    "t": "p",
+    "x": "• Capital committed: $200 million"
+  },
+  {
+    "t": "p",
+    "x": "• Preferred return: 8% soft hurdle, with full catch-up"
+  },
+  {
+    "t": "p",
+    "x": "• Fund distribution: after five years"
+  },
+  {
+    "t": "p",
+    "x": "• Management fee: none"
+  },
+  {
+    "t": "p",
+    "x": "• Carried interest: 20% above preferred return"
+  },
+  {
+    "t": "p",
+    "x": "• Waterfall structure: European (whole of fund) The fund made five investments that are tabulated as follows:"
+  },
+  {
+    "t": "table",
+    "x": "Year | Amount ($ m) | Profit"
+  },
+  {
+    "t": "p",
+    "x": "Investment"
+  },
+  {
+    "t": "table",
+    "x": "No. | Invested | Sold | Invested | Sold | $m | %\n1 | 0 | 4 | 40 | 60 | 20 | 10.67%\n2 | 0 | 4 | 40 | 100 | 60 | 25.74%\n3 | 1 | 5 | 40 | 50 | 10 | 5.74%\n4 | 1 | 5 | 40 | 120 | 80 | 31.61%\n5 | 2 | 5 | 40 | 30 | (10) | neg.\nTotal | 200 | 360 | 160 | 12.47%"
+  },
+  {
+    "t": "p",
+    "x": "What is the total carried interest to the GP? A. $30 million"
+  },
+  {
+    "t": "p",
+    "x": "B. $32 million"
+  },
+  {
+    "t": "p",
+    "x": "C. $34 million"
+  },
+  {
+    "t": "p",
+    "x": "7. A hedge fund has the following fee structure:"
+  },
+  {
+    "t": "p",
+    "x": "• Annual management fee based on year-end AUM: 2%"
+  },
+  {
+    "t": "p",
+    "x": "• Incentive fee: 20%"
+  },
+  {
+    "t": "p",
+    "x": "• Hurdle rate before incentive fee collection starts: 4%"
+  },
+  {
+    "t": "p",
+    "x": "• Current high-water mark: $610 million"
+  },
+  {
+    "t": "p",
+    "x": "• Incentive fees (and hurdle rate considerations) are determined post management fees The fund has a value of $583.1 million at the beginning of the year. After one year, it has a value of $642 million before fees. Assume performance fees and management fees are calculated independently. The net percentage return to an investor for this year is closest to: A. 6.72%."
+  },
+  {
+    "t": "p",
+    "x": "B. 6.80%."
+  },
+  {
+    "t": "p",
+    "x": "C. 7.24%."
+  },
+  {
+    "t": "h",
+    "x": "Solutions"
+  },
+  {
+    "t": "p",
+    "x": "1. A is correct. Although the gross return of Rotunda results in a $360 million gross NAV, the deduction of the $7.2 million management fee brings NAV to $352.8 million, which is below the prior high-water mark. Rotunda earns a management fee of $7.20 million but does not earn an incentive fee because the year-end fund value net of management fee does not exceed the prior high-water mark of $357 million. Since Rotunda is still also below the prior-year high-water mark, the hurdle rate of return is also basically irrelevant in this fee calculation. The specifics of this calculation are as follows:"
+  },
+  {
+    "t": "p",
+    "x": "End-of-year AUM = Prior year-end AUM × (1 + Fund return) = $288 million × 1.25 = $360 million. $360 million × 2% = $7.20 million management fee. $360 million − $7.2 million = $352.8 million AUM net of management fee. The year-end AUM net of fees do not exceed the $357 million high-water mark. Therefore, no incentive fee is earned."
+  },
+  {
+    "t": "p",
+    "x": "2. B is correct. Using Equation 2, rL = Leveraged portfolio return/Cash position = [r × (Vb+Vc) – (Vb × rb)]/Vc."
+  },
+  {
+    "t": "p",
+    "x": "Or, after re-arranging the formula,"
+  },
+  {
+    "t": "p",
+    "x": "( Vc × rL ) + ( Vb × rb) r = ________________"
+  },
+  {
+    "t": "table",
+    "x": "(V + V ) | .\nc | b"
+  },
+  {
+    "t": "p",
+    "x": "Substituting rL = 0.15, Vb = 200, Vc = 500, rb = 0.045,"
+  },
+  {
+    "t": "p",
+    "x": "r = (500 × 0.15) + (200 × 0.045)/(200 + 500) = 12%. Since leverage magnifies return when the borrowing cost is lower than asset returns, the unleveraged asset return must be lower than 15%."
+  },
+  {
+    "t": "p",
+    "x": "3. B is correct. Accounting rules require that investments be recorded at their fair value for financial reporting purposes. The fair value of private equity that owns illiquid assets requires certain estimates, rather than observable transaction prices, to be factored into valuation. A model that relies on Level 3 inputs may reflect an imperfect theoretical valuation and not a true liquidation value. The lack of new market information over time may anchor the interim valuation at or near initial cost. The relatively stable accounting valuations may give investors a false sense that they are less volatile. At the same time, there is a potential conflict of interest for the GP to overstate interim return because of the implication for carried interest. As a result, returns may be smoothed or overstated and the volatility of returns understated."
+  },
+  {
+    "t": "p",
+    "x": "4. C is correct. Despite investing for the shortest period of time in the fund (i.e., two years), Investor C has earned the highest net return compared to the other two investors. The following table illustrates the calculations based on the “2 and 20” fee structure and the high-water marks facing each investor in any particular year; in each case, the incentive fee is calculated using Equation 8: RGP(High-Water Mark) = (P2 × rm) + max{0, [P2 (1 – rm) – PHWM] × p}."
+  },
+  {
+    "t": "p",
+    "x": "The net return is calculated using Equation 9:"
+  },
+  {
+    "t": "p",
+    "x": "ri = (P2 – P1 – RGP)/P1."
+  },
+  {
+    "t": "p",
+    "x": "Annual"
+  },
+  {
+    "t": "table",
+    "x": "Gross | Investor A’s | Year-End AUM | High-Water | Management | Incentive | Year-End AUM\nYear | Return | Investment | (Before Fee) | Mark | Fee (2%) | Fee (20%) | (After Fee)"
+  },
+  {
+    "t": "p",
+    "x": "(Before Fee)"
+  },
+  {
+    "t": "table",
+    "x": "0 | — | 100.00 | 100.00 | — | — | — | 100.00\n1 | 20% | — | 120.00 | 100.00 | 2.40 | 3.52 | 114.08\n2 | -15% | — | 96.97 | 114.08 | 1.94 | — | 95.03\n3 | 15% | — | 109.28 | 114.08 | 2.19 | — | 107.10\n4 | 10% | — | 117.81 | 114.08 | 2.36 | 0.27 | 115.18\nInvestor A's net return | 15.18%"
+  },
+  {
+    "t": "p",
+    "x": "Annual"
+  },
+  {
+    "t": "table",
+    "x": "Gross | Investor B’s | Year-End AUM | High-Water | Management | Incentive | Year-End AUM\nYear | Return | Investment | (Before Fee) | Mark | Fee (2%) | Fee (20%) | (Before Fee)\n0 | — | — | — | — | — | — | —\n1 | 20% | — | — | — | — | — | —\n2 | -15% | 100.00 | 85.00 | 100.00 | 1.70 | — | 83.30\n3 | 15% | 95.80 | 100.00 | 1.92 | — | 93.88\n4 | 10% | — | 103.27 | 100.00 | 2.07 | 0.24 | 100.96\nInvestor B's net return | 0.96%"
+  },
+  {
+    "t": "p",
+    "x": "Annual"
+  },
+  {
+    "t": "table",
+    "x": "Gross | Investor C’s | Year-End AUM | High-Water | Management | Incentive | Year-End AUM\nYear | Return | Investment | (Before Fee) | Mark | Fee (2%) | Fee (20%) | (Before Fee)\n0 | — | — | — | — | — | — | —\n1 | 20% | — | — | — | — | — | —\n2 | -15% | — | — | — | — | — | —\n3 | 15% | 100.00 | 115.00 | 100.00 | 2.30 | 2.54 | 110.16\n4 | 10% | — | 121.18 | 110.16 | 2.42 | 1.72 | 117.03\nInvestor C's Net Return | 17.03%"
+  },
+  {
+    "t": "p",
+    "x": "5. A is correct. The distribution of profit of each investment is as follows:"
+  },
+  {
+    "t": "table",
+    "x": "Year | Amount ($ m) | Profit\nInvestment | LPs at | GP at\nNo. | Invested Sold | Invested Sold | $m | % | 80% | 20%\n1 | 0 | 4 | 40 | 60 | 20 | 10.67% | 16 | 4\n2 | 0 | 4 | 40 | 100 | 60 | 25.74% | 48 | 12\n3 | 1 | 5 | 40 | 50 | 10 | 5.74% | 10 | 0\n4 | 1 | 5 | 40 | 120 | 80 | 31.61% | 64 | 16\nSolutions | 63\nYear | Amount ($ m) | Profit\nInvestment | LPs at | GP at\nNo. | Invested Sold | Invested Sold | $m | % | 80% | 20%\n5 | 2 | 5 | 40 | 30 | (10) | neg. | (8) | (2)\nTotal | 200 | 360 | 160 | 12.47% | 130 | 30"
+  },
+  {
+    "t": "p",
+    "x": "Since the preferred return of the LP is 8%, Investments 1, 2, and 4 all meet the criterion and the profit is split 80/20 between the LPs and GP. Investment 3 does not earn the GP any carry because it fails to meet the preferred return; neither does Investment 5, whose profit is negative. Because of the clawback clause, the GP’s carry is reduced by $2 million (or 20% of the loss on Investment 5). Therefore, the total carried interest adds up to $30 million, or 30/160 = 18.75% of the total profit made by the fund."
+  },
+  {
+    "t": "p",
+    "x": "6. B is correct. A European waterfall occurs at the aggregate fund level. As long as the fund exit IRR exceeds 8% after five years, the GP will be eligible for the full 20% carried interest on the profit made from all investments—that is, $160 million × 20% = $32 million."
+  },
+  {
+    "t": "table",
+    "x": "Year | Amount ($ m) | Profit\nInvestment | LPs at | GP at\nNo. | Invested Sold | Invested | Sold | $m | % | 80% | 20%\n1 | 0 | 4 | 40 | 60 | 20 | 10.67%\n2 | 0 | 4 | 40 | 100 | 60 | 25.74%\n3 | 1 | 5 | 40 | 50 | 10 | 5.74%\n4 | 1 | 5 | 40 | 120 | 80 | 31.61%\n5 | 2 | 5 | 40 | 30 | (10) | neg.\nTotal | 200 | 360 | 160 | 12.47% | 128 | 32"
+  },
+  {
+    "t": "p",
+    "x": "7. C is correct. The management fee for the year is $642 million × 0.02 = $12.84 million. Because the ending gross value of the fund of $642 million exceeds the high-water mark of $610 million, the hedge fund can collect an incentive fee on gains above this high-water mark but net of the hurdle rate of return. The incentive fee calculation becomes Net Value Post Management Fees = (1 – 0.02) × $624 = $6.2916 Million"
+  },
+  {
+    "t": "p",
+    "x": "Incentive Fee = max(0,[629.16 − max(610, 1.04 × 583.1)] × 0.2) = $3.832 Million"
+  },
+  {
+    "t": "p",
+    "x": "Total fees are 3.832 + 12.84 = $16.672 Million and the final NAV is 642 − 16.672 = $625.328 Million. So, the net return is 625.328/583.1 − 1 = 7.24%"
+  }
+]
